@@ -36,7 +36,7 @@ This command will:
 * Save a table of results to `table.txt`.
 * Save a FASTA file of any new alleles to `new_consensus_alleles.fasta`.
 
-### Example gene database
+### Example query gene database
 
 ```
 >0__abcA__abcA_1__0
@@ -48,6 +48,8 @@ ATGAGAAATAAAGGAATCGATCAATTTTGTGTGATTGCA
 >1__abcB__abcB_2__3
 ATGAAAAATAAAGGAATCGATCAATTTCGTGTGATTGCA
 ```
+
+For this script, the important parts are the gene cluster name and the allele name, the second and third pieces of the sequence header delimited with `__`.
 
 ### Example output table
 
