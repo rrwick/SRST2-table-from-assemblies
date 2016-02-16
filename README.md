@@ -1,4 +1,4 @@
-# SRST2 results from assemblies
+# SRST2 table from assemblies
 
 This is a tool for conducting a gene screen on assemblies.  It produces a table which mimics the format of [SRST2](https://github.com/katholt/srst2)'s compiled results.
 
@@ -8,35 +8,28 @@ It uses [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) to conduct the ge
 
 ## Usage:
 ```
-srst2_results_from_assemblies.py [-h] --assemblies ASSEMBLIES [ASSEMBLIES ...]
-                                 --gene_db GENE_DB
-                                 --output OUTPUT
-                                 [--min_coverage MIN_COVERAGE]
-                                 [--max_divergence MAX_DIVERGENCE]
-                                 [--report_new_consensus]
-                                 [--report_all_consensus]
-                                 [--algorithm ALGORITHM]
+srst2_table_from_assemblies.py [-h] --assemblies ASSEMBLIES [ASSEMBLIES ...]
+                               --gene_db GENE_DB
+                               --output OUTPUT
+                               [--min_coverage MIN_COVERAGE]
+                               [--max_divergence MAX_DIVERGENCE]
+                               [--report_new_consensus]
+                               [--report_all_consensus]
+                               [--algorithm ALGORITHM]
 ```
 
-`--assemblies`: FASTA files of all assemblies to screen.  The sample name will be taken from the assembly filename (without the `.fasta` or `.fa` extension)
-
-`--gene_db`: a gene database to search for in [SRST2 format](https://github.com/katholt/srst2#generating-srst2-compatible-clustered-database-from-raw-sequences)
-
-`--output`: the filename for the resulting table
-
-`--min_coverage`: the minimum allowed BLAST hit percent coverage for an allele (default = 90)
-
-`--max_divergence`: the maximum allowed percent divergence between a BLAST hit and an allele sequence (default = 10)
-
-`--report_new_consensus`: save all novel alleles (those which do not exactly match any in the gene database) to a FASTA file named `new_consensus_alleles.fasta`
-
-`--report_all_consensus`: save all found alleles (both those in the gene database and novel alleles) to a FASTA file named `all_consensus_alleles.fasta`
-
-`--algorithm`: which BLAST+ algorithm to use (`blastn`, `blastn-short`, `megablast` or `dc-megablast`, default = `blastn`)
+* `--assemblies`: FASTA files of all assemblies to screen.  The sample name will be taken from the assembly filename (without the `.fasta` or `.fa` extension)
+* `--gene_db`: a gene database to search for in [SRST2 format](https://github.com/katholt/srst2#generating-srst2-compatible-clustered-database-from-raw-sequences)
+* `--output`: the filename for the resulting tab-delimited table
+* `--min_coverage`: the minimum allowed BLAST hit percent coverage for an allele (default = 90)
+* `--max_divergence`: the maximum allowed percent divergence between a BLAST hit and an allele sequence (default = 10)
+* `--report_new_consensus`: save all novel alleles (those which do not exactly match any in the gene database) to a FASTA file named `new_consensus_alleles.fasta`
+* `--report_all_consensus`: save all found alleles (both those in the gene database and novel alleles) to a FASTA file named `all_consensus_alleles.fasta`
+* `--algorithm`: which BLAST+ algorithm to use (`blastn`, `blastn-short`, `megablast` or `dc-megablast`, default = `blastn`)
 
 ### Example command
 
-`srst2_results_from_assemblies.py --assemblies *.fasta --gene_db resistance_genes.mfasta --output table.txt --report_new_consensus`
+`srst2_table_from_assemblies.py --assemblies *.fasta --gene_db resistance_genes.mfasta --output table.txt --report_new_consensus`
 
 This command will:
 * Screen every one of the assemblies (all `*.fasta` files) for each of the genes in `resistance_genes.mfasta` using `blastn`
@@ -65,8 +58,8 @@ sample2 | abcA_1 | abcB_2* |
 sample3 | abcA_2 | - |
 
 As is the case for SRST2:
-* Imperfect matches (containing at least one mismatch or indel) are indicated with a `*` after the allele name.
-* Absent genes are indicated with `-`.
+* Imperfect matches (containing at least one mismatch or indel) are indicated with '*' after the allele name.
+* Absent genes are indicated with '-'.
 
 ## License
 
