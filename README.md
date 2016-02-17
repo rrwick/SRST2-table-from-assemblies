@@ -29,7 +29,7 @@ srst2_table_from_assemblies.py [-h] --assemblies ASSEMBLIES [ASSEMBLIES ...]
 
 ### Example command
 
-`srst2_table_from_assemblies.py --assemblies *.fasta --gene_db resistance_genes.mfasta --output table.txt --report_new_consensus`
+`srst2_table_from_assemblies.py --assemblies *.fasta --gene_db genes.mfasta --output table.txt --report_new_consensus`
 
 This command will:
 * Screen every one of the assemblies (all `*.fasta` files) for each of the genes in `resistance_genes.mfasta` using `blastn`.
@@ -40,13 +40,13 @@ This command will:
 
 ```
 >0__abcA__abcA_1__0
-ATGGACTTTTCCCGCTTTTATATCGACAGGCCGATCTTC
+TCGCAGGGCGAGCGGCGCGTCTCACGGAATGACCATGTCCTGCATCATAAATTAACGTAA
 >0__abcA__abcA_2__1
-ATGGACTTTTCCCGCTTTTTTATCGACAGGCCGATTTTC
+TCGCAGGGCGAGCGCCGCGTCTCACGGAATGACCATGTCCTGCATGATAAATTAACGTAA
 >1__abcB__abcB_1__2
-ATGAGAAATAAAGGAATCGATCAATTTTGTGTGATTGCA
+TAATAGTGATGGGTATTGAGGGCTCCCCTTGAAGCCTCGCAGAAAGCAGATCAATTTCAA
 >1__abcB__abcB_2__3
-ATGAAAAATAAAGGAATCGATCAATTTCGTGTGATTGCA
+TAATAGTGATGGGTTTTGAGGGCTCGCCTTGAAGCCTCGCAGATAGCAGATCAATTTCAA
 ```
 
 For this script, the important parts are the gene cluster name and the allele name, the second and third pieces of the sequence header delimited with `__`.
