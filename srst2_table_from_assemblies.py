@@ -129,7 +129,7 @@ def blast_assembly(assembly, gene_db, algorithm):
             print(err, file=sys.stderr)
             quit()
 
-    blastn_command = ['blastn', '-task', algorithm, '-db', assembly, '-query', gene_db, '-outfmt', '6 qseqid pident qlen length sseq']
+    blastn_command = ['blastn', '-task', algorithm, '-db', assembly, '-query', gene_db, '-outfmt', '6 qseqid pident qlen length sseq bitscore']
     process = subprocess.Popen(blastn_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = process.communicate()
     if len(err) > 0:
@@ -149,6 +149,7 @@ def blast_assembly(assembly, gene_db, algorithm):
         hit_length = float(line_parts[3])
         coverage = 100.0 * hit_length / query_length
         hit_seq = line_parts[4]
+        bit_score = float(line_parts[5])
         query_name_parts = query_name.split('__')
         if len(query_name_parts) < 4:
             print('Error: gene database names must be in the following format:', file=sys.stderr)
@@ -157,7 +158,7 @@ def blast_assembly(assembly, gene_db, algorithm):
         cluster_name = query_name_parts[1]
         allele_name = query_name_parts[2]
 
-        blast_results.append((query_name, cluster_name, allele_name, identity, coverage, hit_seq))
+        blast_results.append((query_name, cluster_name, allele_name, identity, coverage, hit_seq, bit_score))
 
     return blast_results
 
@@ -182,14 +183,19 @@ def get_best_match_for_each_cluster(filtered_blast_results):
         identity = result[3]
         coverage = result[4]
         hit_seq = result[5].replace('-', '')
+        bit_score = result[6]
+
+        # If a hit is the first one for its cluster, then it is by definition the best hit.
         if cluster_name not in best_hits:
-            best_hits[cluster_name] = (query_name, allele_name, identity, coverage, hit_seq)
+            best_hits[cluster_name] = (query_name, allele_name, identity, coverage, hit_seq, bit_score)
+
+        # If a hit is perfect, then it is always the best hit.
+        # If it isn't perfect, then it is the best hit if it beats the previous best's bit score.
         else:
-            previous_best_hit = best_hits[cluster_name]
-            previous_best_identity = previous_best_hit[2]
-            previous_best_coverage = previous_best_hit[3]
-            if identity > previous_best_identity or (identity == previous_best_identity and coverage > previous_best_coverage):
-                best_hits[cluster_name] = (query_name, allele_name, identity, coverage, hit_seq)
+            previous_best_bit_score = best_hits[cluster_name][5]
+            if (identity == 100.0 and coverage == 100.0) or (bit_score > previous_best_bit_score):
+                best_hits[cluster_name] = (query_name, allele_name, identity, coverage, hit_seq, bit_score)
+
     return best_hits
 
 

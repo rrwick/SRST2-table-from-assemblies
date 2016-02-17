@@ -63,6 +63,8 @@ As is the case for SRST2:
 * Imperfect matches (containing at least one mismatch or indel) are indicated with '*' after the allele name.
 * Absent genes are indicated with '-'.
 
+When no perfect allele match is present but there are multiple possible alleles (which satisfy the coverage and divergence thresholds), this script will choose the one with the highest BLAST hit bit score.  Using the above table as an example, if sample2 matched abcB_1 with a bit score of 123.4 and abcB_2 with a bit score of 134.5, this script will choose abcB_2 and include a '*' to indicate the match was not exact.
+
 ## License
 
 GNU General Public License, version 3
