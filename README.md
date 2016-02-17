@@ -2,7 +2,7 @@
 
 This is a tool for conducting a gene screen on assemblies.  It produces a table which mimics the format of [SRST2](https://github.com/katholt/srst2)'s compiled results.
 
-It can be useful when there are some samples for which you have reads and other samples for which you only have assemblies.  You can then use SRST2 to conduct a gene screen on the reads and this script to conduct a gene screen on the assemblies.  The results can then be combined using SRST2.  Note that if you have both reads and assemblies, it is preferrable to use SRST2 on the reads instead of this script (better sensitivity).
+It can be useful when there are some samples for which you have reads and other samples for which you only have assemblies.  You can use SRST2 to conduct a gene screen on the reads and this script to conduct a gene screen on the assemblies.  The results can then be combined using SRST2.  Note that if you have both reads and assemblies, it is preferrable to use SRST2 on the reads instead of this script, as SRST2 has better sensitivity.
 
 It uses [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) to conduct the gene searches and requires BLAST+ to be installed.
 
@@ -63,7 +63,7 @@ As is the case for SRST2:
 * Imperfect matches (containing at least one mismatch or indel) are indicated with '*' after the allele name.
 * Absent genes are indicated with '-'.
 
-When no perfect allele match is present but there are multiple possible alleles (which satisfy the coverage and divergence thresholds), this script will choose the one with the highest BLAST hit bit score.  Using the above table as an example, if sample2 matched abcB_1 with a bit score of 123.4 and abcB_2 with a bit score of 134.5, this script will choose abcB_2 and include a '*' to indicate the match was not exact.
+When no perfect allele match is present but there are multiple possible alleles (which satisfy the coverage and divergence thresholds), this script will choose the one with the highest BLAST bit score.  Using the above table as an example, if sample2 matched abcB_1 with a bit score of 123.4 and abcB_2 with a bit score of 134.5, this script will choose abcB_2 and include a '*' to indicate the match was not exact.
 
 ## License
 
