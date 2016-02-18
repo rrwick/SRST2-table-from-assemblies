@@ -67,6 +67,10 @@ As is the case for SRST2:
 
 When no perfect allele match is present but there are multiple possible alleles (which satisfy the coverage and divergence thresholds), this script will choose the one with the highest BLAST bit score.  Using the above table as an example, if sample2 matched abcB_1 with a bit score of 123.4 and abcB_2 with a bit score of 134.5, this script will choose abcB_2 and include a '*' to indicate the match was not exact.
 
+## SLURM queueing system
+
+Another script, `srst2_table_from_assemblies_slurm.py`, is included to generate SLURM jobs to run many gene screens in parallel.  This will generate a separate output table for each assembly, so you may want to then [compile them together using SRST2](https://github.com/katholt/srst2#running-lots-of-jobs-and-compiling-results).
+
 ## License
 
 GNU General Public License, version 3
