@@ -103,7 +103,7 @@ def get_arguments():
     parser.add_argument('--script', type=str, required=False, help="path to srst2_table_from_assemblies.py, if not in current directory or this script's directory")
     parser.add_argument('--assemblies', nargs='+', type=str, required=True, help='Fasta file/s for assembled contigs')
     parser.add_argument('--gene_db', type=str, required=True, help='Fasta file for gene databases')
-    parser.add_argument('--output', type=str, required=True, help='Compiled table of results (will be combined with assembly identifiers)')
+    parser.add_argument('--output', type=str, required=True, help='Identifier for outputs (will be combined with assembly identifiers)')
     parser.add_argument('--min_coverage', type=float, required=False, help='Minimum %%coverage cutoff for gene reporting (default 90)')
     parser.add_argument('--max_divergence', type=float, required=False, help='Maximum %%divergence cutoff for gene reporting (default 10)')
     parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file (will be combined with assembly identifiers)')

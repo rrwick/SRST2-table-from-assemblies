@@ -21,7 +21,7 @@ srst2_table_from_assemblies.py [-h]
 
 * `--assemblies`: FASTA files of all assemblies to screen.  The sample name will be taken from the assembly filename (without the `.fasta` or `.fa` extension).  If a BLAST database does not exist for each assembly (`.nhr`, `.nin` and `.nsq` files), then it will be made using `makeblastdb`.  Since doing so creates new files, you will need write permission to the directory of the assembly.
 * `--gene_db`: a gene database to search for in [SRST2 format](https://github.com/katholt/srst2#generating-srst2-compatible-clustered-database-from-raw-sequences).
-* `--output`: the filename for the resulting tab-delimited table.
+* `--output`: The output prefix for the table of results.  The table's full name will be [prefix]__genes__[gene_db]__results.txt
 * `--min_coverage`: the minimum allowed BLAST hit percent coverage for an allele (default = 90).
 * `--max_divergence`: the maximum allowed percent divergence between a BLAST hit and an allele sequence (default = 10).
 * `--report_new_consensus`: When matching alleles are not found, report the found alleles in this file.
@@ -30,11 +30,11 @@ srst2_table_from_assemblies.py [-h]
 
 ### Example command
 
-`srst2_table_from_assemblies.py --assemblies *.fasta --gene_db genes.mfasta --output table.txt --report_new_consensus new_alleles.fasta`
+`srst2_table_from_assemblies.py --assemblies *.fasta --gene_db gene_db.mfasta --output test --report_new_consensus new_alleles.fasta`
 
 This command will:
 * Screen every one of the assemblies (all `*.fasta` files) for each of the genes in `resistance_genes.mfasta` using `blastn`.
-* Save a table of results to `table.txt`.
+* Save a table of results to `test__genes__gene_db__results.txt`.
 * Save a FASTA file of any new alleles to `new_alleles.fasta`.
 
 ### Example query gene database

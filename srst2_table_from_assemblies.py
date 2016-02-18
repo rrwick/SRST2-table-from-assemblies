@@ -24,8 +24,8 @@ def main():
     check_file_exists(args.gene_db)
     check_algorithm(args.algorithm)
 
-
     unique_allele_symbols = determine_allele_symbol_uniqueness(args.gene_db)
+    gene_db_name = os.path.splitext(os.path.basename(args.gene_db))[0]
 
     if args.report_new_consensus:
         new_consensus_path, new_consensus_name = os.path.split(args.report_new_consensus)
@@ -38,9 +38,10 @@ def main():
             os.makedirs(all_consensus_path)
         all_consensus_alleles = open(args.report_all_consensus, 'w')
 
-    output_path, output_name = os.path.split(args.output)
+    output_path, output_prefix = os.path.split(args.output)
     if output_path and not os.path.exists(output_path):
         os.makedirs(output_path)
+    output_table = output_prefix + '__genes__' + gene_db_name + '__results.txt'
 
     all_clusters = set()
     all_results = {} # key = assembly_name, value = dict of cluster and allele
@@ -65,7 +66,7 @@ def main():
     sorted_clusters = sorted(list(all_clusters))
     sorted_assemblies = sorted(list(all_results.keys()))
 
-    out_file = open(args.output, 'w')
+    out_file = open(output_table, 'w')
     out_file.write('Sample\t')
     out_file.write('\t'.join(sorted_clusters))
     out_file.write('\n')
@@ -119,7 +120,7 @@ def get_arguments():
     parser = argparse.ArgumentParser(description='SRST2 table from assemblies')
     parser.add_argument('--assemblies', nargs='+', type=str, required=True, help='Fasta file/s for assembled contigs')
     parser.add_argument('--gene_db', type=str, required=True, help='Fasta file for gene databases')
-    parser.add_argument('--output', type=str, required=True, help='Compiled table of results')
+    parser.add_argument('--output', type=str, required=True, help='Output prefix for table of results')
     parser.add_argument('--min_coverage', type=float, required=False, help='Minimum %%coverage cutoff for gene reporting (default 90)',default=90)
     parser.add_argument('--max_divergence', type=float, required=False, help='Maximum %%divergence cutoff for gene reporting (default 10)',default=10)
     parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file')
