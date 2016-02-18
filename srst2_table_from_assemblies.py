@@ -120,7 +120,7 @@ def get_arguments():
     parser = argparse.ArgumentParser(description='SRST2 table from assemblies')
     parser.add_argument('--assemblies', nargs='+', type=str, required=True, help='Fasta file/s for assembled contigs')
     parser.add_argument('--gene_db', type=str, required=True, help='Fasta file for gene databases')
-    parser.add_argument('--output', type=str, required=True, help='Output prefix for table of results')
+    parser.add_argument('--output', type=str, required=True, help='Output prefix for the table of results')
     parser.add_argument('--min_coverage', type=float, required=False, help='Minimum %%coverage cutoff for gene reporting (default 90)',default=90)
     parser.add_argument('--max_divergence', type=float, required=False, help='Maximum %%divergence cutoff for gene reporting (default 10)',default=10)
     parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file')
