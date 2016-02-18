@@ -86,7 +86,7 @@ def main():
 
 def check_file_exists(filename):
     if not os.path.isfile(filename):
-        print('Error: could not load ' + contig_filename, file=sys.stderr)
+        print('Error: could not load ' + filename, file=sys.stderr)
         quit()
 
 
