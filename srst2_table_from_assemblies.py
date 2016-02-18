@@ -24,17 +24,28 @@ def main():
     check_file_exists(args.gene_db)
     check_algorithm(args.algorithm)
 
+
     unique_allele_symbols = determine_allele_symbol_uniqueness(args.gene_db)
 
     if args.report_new_consensus:
-        new_consensus_alleles = open('new_consensus_alleles.fasta', 'w')
+        new_consensus_path, new_consensus_name = os.path.split(args.report_new_consensus)
+        if new_consensus_path and not os.path.exists(new_consensus_path):
+            os.makedirs(new_consensus_path)
+        new_consensus_alleles = open(args.report_new_consensus, 'w')
     if args.report_all_consensus:
-        all_consensus_alleles = open('all_consensus_alleles.fasta', 'w')
+        all_consensus_path, all_consensus_name = os.path.split(args.report_all_consensus)
+        if all_consensus_path and not os.path.exists(all_consensus_path):
+            os.makedirs(all_consensus_path)
+        all_consensus_alleles = open(args.report_all_consensus, 'w')
+
+    output_path, output_name = os.path.split(args.output)
+    if output_path and not os.path.exists(output_path):
+        os.makedirs(output_path)
 
     all_clusters = set()
     all_results = {} # key = assembly_name, value = dict of cluster and allele
     for assembly in args.assemblies:
-        assembly_name = remove_extension_from_assembly_file(assembly)
+        assembly_name = remove_extension_from_assembly_file(os.path.basename(assembly))
         all_results[assembly_name] = {}
         blast_results = blast_assembly(assembly, args.gene_db, args.algorithm, unique_allele_symbols)
         filtered_blast_results = filter_blast_results(blast_results, args.min_coverage, args.max_divergence)
@@ -111,8 +122,8 @@ def get_arguments():
     parser.add_argument('--output', type=str, required=True, help='Compiled table of results')
     parser.add_argument('--min_coverage', type=float, required=False, help='Minimum %%coverage cutoff for gene reporting (default 90)',default=90)
     parser.add_argument('--max_divergence', type=float, required=False, help='Maximum %%divergence cutoff for gene reporting (default 10)',default=10)
-    parser.add_argument('--report_new_consensus', action="store_true", required=False, help='If a matching alleles is not found, report the consensus allele. Note, only SNP differences are considered, not indels.')
-    parser.add_argument('--report_all_consensus', action="store_true", required=False, help='Report the consensus allele for the most likely allele. Note, only SNP differences are considered, not indels.')
+    parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file')
+    parser.add_argument('--report_all_consensus', type=str, required=False, help='Report all found alleles in this file')
     parser.add_argument('--algorithm', action="store", help="blast algorithm (blastn)", default="blastn")
     return parser.parse_args()
 
