@@ -41,7 +41,7 @@ def main():
     output_path, output_prefix = os.path.split(args.output)
     if output_path and not os.path.exists(output_path):
         os.makedirs(output_path)
-    output_table = output_prefix + '__genes__' + gene_db_name + '__results.txt'
+    output_table = os.path.join(output_path, output_prefix + '__genes__' + gene_db_name + '__results.txt')
 
     all_clusters = set()
     all_results = {} # key = assembly_name, value = dict of cluster and allele
