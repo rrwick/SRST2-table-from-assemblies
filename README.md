@@ -8,13 +8,14 @@ It uses [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) to conduct the ge
 
 ## Usage:
 ```
-srst2_table_from_assemblies.py [-h] --assemblies ASSEMBLIES [ASSEMBLIES ...]
+srst2_table_from_assemblies.py [-h]
+                               --assemblies ASSEMBLIES [ASSEMBLIES ...]
                                --gene_db GENE_DB
                                --output OUTPUT
                                [--min_coverage MIN_COVERAGE]
                                [--max_divergence MAX_DIVERGENCE]
-                               [--report_new_consensus]
-                               [--report_all_consensus]
+                               [--report_new_consensus REPORT_NEW_CONSENSUS]
+                               [--report_all_consensus REPORT_ALL_CONSENSUS]
                                [--algorithm ALGORITHM]
 ```
 
@@ -23,18 +24,18 @@ srst2_table_from_assemblies.py [-h] --assemblies ASSEMBLIES [ASSEMBLIES ...]
 * `--output`: the filename for the resulting tab-delimited table.
 * `--min_coverage`: the minimum allowed BLAST hit percent coverage for an allele (default = 90).
 * `--max_divergence`: the maximum allowed percent divergence between a BLAST hit and an allele sequence (default = 10).
-* `--report_new_consensus`: save all novel alleles (those which do not exactly match any in the gene database) to a FASTA file named `new_consensus_alleles.fasta`.
-* `--report_all_consensus`: save all found alleles (both those in the gene database and novel alleles) to a FASTA file named `all_consensus_alleles.fasta`.
+* `--report_new_consensus`: When matching alleles are not found, report the found alleles in this file.
+* `--report_all_consensus`: Report all found alleles in this file.
 * `--algorithm`: which BLAST+ algorithm to use (`blastn`, `blastn-short`, `megablast` or `dc-megablast`, default = `blastn`).
 
 ### Example command
 
-`srst2_table_from_assemblies.py --assemblies *.fasta --gene_db genes.mfasta --output table.txt --report_new_consensus`
+`srst2_table_from_assemblies.py --assemblies *.fasta --gene_db genes.mfasta --output table.txt --report_new_consensus new_alleles.fasta`
 
 This command will:
 * Screen every one of the assemblies (all `*.fasta` files) for each of the genes in `resistance_genes.mfasta` using `blastn`.
 * Save a table of results to `table.txt`.
-* Save a FASTA file of any new alleles to `new_consensus_alleles.fasta`.
+* Save a FASTA file of any new alleles to `new_alleles.fasta`.
 
 ### Example query gene database
 
