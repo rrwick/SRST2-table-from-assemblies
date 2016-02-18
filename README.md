@@ -51,6 +51,8 @@ TAATAGTGATGGGTTTTGAGGGCTCGCCTTGAAGCCTCGCAGATAGCAGATCAATTTCAA
 
 For this script, the important parts are the gene cluster name and the allele name, the second and third pieces of the sequence header delimited with `__`.
 
+Ideally, every allele in your database has a unique name.  If this is the case, this script's output table will use only the allele names.  If it is not the case (i.e. there is at least one duplicate allele name in the database), then the output table will use a combination of the allele name and the allele unique ID (the last piece of the sequence header).  This is the same behaviour as SRST2.
+
 ### Example output table
 
 Sample | abcA | abcB
