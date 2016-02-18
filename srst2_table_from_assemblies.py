@@ -67,11 +67,10 @@ def main():
     sorted_assemblies = sorted(list(all_results.keys()))
 
     out_file = open(output_table, 'w')
-    out_file.write('Sample\t')
-    out_file.write('\t'.join(sorted_clusters))
+    out_file.write('\t'.join(['Sample'] + sorted_clusters))
     out_file.write('\n')
     for assembly in sorted_assemblies:
-        out_file.write(assembly + '\t')
+        assemly_line = assembly + '\t'
         results = []
         for cluster in sorted_clusters:
             if cluster not in all_results[assembly]:
@@ -91,7 +90,7 @@ def main():
                     add_fasta_to_file(full_query_name + ' ' + assembly, hit_seq, all_consensus_alleles)
                 if args.report_new_consensus and imperfect_match:
                     add_fasta_to_file(query_name + '.variant ' + assembly, hit_seq, new_consensus_alleles)
-        out_file.write('\t'.join(results))
+        out_file.write('\t'.join([assembly] + results))
         out_file.write('\n')
 
 
