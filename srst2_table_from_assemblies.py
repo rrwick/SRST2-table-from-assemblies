@@ -16,7 +16,6 @@ import argparse
 import subprocess
 import os
 from distutils import spawn
-from sets import Set
 
 
 def main():
@@ -32,7 +31,7 @@ def main():
     if args.report_all_consensus:
         all_consensus_alleles = open('all_consensus_alleles.fasta', 'w')
 
-    all_clusters = Set()
+    all_clusters = set()
     all_results = {} # key = assembly_name, value = dict of cluster and allele
     for assembly in args.assemblies:
         assembly_name = remove_extension_from_assembly_file(assembly)
@@ -245,7 +244,7 @@ def determine_allele_symbol_uniqueness(gene_db_filename):
     least one duplicate.
     This mimics the behaviour of SRST2, which does the same.
     '''
-    allele_names = Set()
+    allele_names = set()
     gene_db = open(gene_db_filename, 'r')
     for line in gene_db:
         if not line.startswith('>'):
