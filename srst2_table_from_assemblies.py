@@ -25,6 +25,8 @@ def main():
     check_file_exists(args.gene_db)
     check_algorithm(args.algorithm)
 
+    unique_allele_symbols = determine_allele_symbol_uniqueness(args.gene_db)
+
     if args.report_new_consensus:
         new_consensus_alleles = open('new_consensus_alleles.fasta', 'w')
     if args.report_all_consensus:
@@ -35,7 +37,7 @@ def main():
     for assembly in args.assemblies:
         assembly_name = remove_extension_from_assembly_file(assembly)
         all_results[assembly_name] = {}
-        blast_results = blast_assembly(assembly, args.gene_db, args.algorithm)
+        blast_results = blast_assembly(assembly, args.gene_db, args.algorithm, unique_allele_symbols)
         filtered_blast_results = filter_blast_results(blast_results, args.min_coverage, args.max_divergence)
         best_hits = get_best_match_for_each_cluster(filtered_blast_results)
         for cluster, best_hit in best_hits.iteritems():
@@ -116,7 +118,7 @@ def get_arguments():
     return parser.parse_args()
 
 
-def blast_assembly(assembly, gene_db, algorithm):
+def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols):
     check_file_exists(assembly)
 
     # Make the BLAST database if it doesn't already exist.
@@ -150,13 +152,17 @@ def blast_assembly(assembly, gene_db, algorithm):
         coverage = 100.0 * hit_length / query_length
         hit_seq = line_parts[4]
         bit_score = float(line_parts[5])
-        query_name_parts = query_name.split('__')
+        query_name_parts = query_name.split()[0].split('__')
         if len(query_name_parts) < 4:
             print('Error: gene database names must be in the following format:', file=sys.stderr)
             print('[clusterUniqueIdentifier]__[clusterSymbol]__[alleleSymbol]__[alleleUniqueIdentifier]', file=sys.stderr)
             quit()
         cluster_name = query_name_parts[1]
         allele_name = query_name_parts[2]
+        allele_id = query_name_parts[3]
+
+        if not unique_allele_symbols:
+            allele_name += '_' + allele_id
 
         blast_results.append((query_name, cluster_name, allele_name, identity, coverage, hit_seq, bit_score))
 
@@ -229,6 +235,27 @@ def add_fasta_to_file(name, seq, file):
     file.write(seq)
     file.write('\n')
 
+
+def determine_allele_symbol_uniqueness(gene_db_filename):
+    '''
+    This function determines whether any two alleles in the gene database have
+    the same allele identifier.  If this is the case, then every allele in the
+    results will have its allele identifier included.
+    It returns True if all allele names are unique and false if there is at
+    least one duplicate.
+    This mimics the behaviour of SRST2, which does the same.
+    '''
+    allele_names = Set()
+    gene_db = open(gene_db_filename, 'r')
+    for line in gene_db:
+        if not line.startswith('>'):
+            continue
+        name_parts = line.split()[0].split('__')
+        allele_name = name_parts[2]
+        if allele_name in allele_names:
+            return False
+        allele_names.add(allele_name)
+    return True
 
 
 if __name__ == '__main__':
