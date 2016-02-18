@@ -106,7 +106,7 @@ def check_for_blast():
 
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description='SRST2 results from assemblies')
+    parser = argparse.ArgumentParser(description='SRST2 table from assemblies')
     parser.add_argument('--assemblies', nargs='+', type=str, required=True, help='Fasta file/s for assembled contigs')
     parser.add_argument('--gene_db', type=str, required=True, help='Fasta file for gene databases')
     parser.add_argument('--output', type=str, required=True, help='Compiled table of results')
