@@ -91,7 +91,9 @@ def main():
             cmd += ' --report_all_consensus ' + all_consensus_name_and_path
 
         print(cmd)
+        print()
         os.system('echo "' + cmd + '" | sbatch')
+        print()
 
 
 
