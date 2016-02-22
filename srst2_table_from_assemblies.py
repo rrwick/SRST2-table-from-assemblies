@@ -200,17 +200,36 @@ def get_best_match_for_each_cluster(filtered_blast_results):
         coverage = result[4]
         hit_seq = result[5].replace('-', '')
         bit_score = result[6]
+        this_hit = (query_name, allele_name, identity, coverage, hit_seq, bit_score)
 
-        # If a hit is the first one for its cluster, then it is by definition the best hit.
+        # If a hit is the first one for its cluster, then it is by definition
+        # the best hit.
         if cluster_name not in best_hits:
-            best_hits[cluster_name] = (query_name, allele_name, identity, coverage, hit_seq, bit_score)
+            best_hits[cluster_name] = this_hit
 
-        # If a hit is perfect, then it is always the best hit.
-        # If it isn't perfect, then it is the best hit if it beats the previous best's bit score.
         else:
-            previous_best_bit_score = best_hits[cluster_name][5]
-            if (identity == 100.0 and coverage == 100.0) or (bit_score > previous_best_bit_score):
-                best_hits[cluster_name] = (query_name, allele_name, identity, coverage, hit_seq, bit_score)
+            current_best_identity = best_hits[cluster_name][2]
+            current_best_coverage = best_hits[cluster_name][3]
+            current_best_length = len(best_hits[cluster_name][4])
+            current_best_bit_score = best_hits[cluster_name][5]
+
+            hit_is_perfect = (identity == 100.0 and coverage == 100.0)
+            current_best_is_perfect = (current_best_identity == 100.0 and current_best_coverage == 100.0)
+
+            # If this hit is perfect and the current best isn't perfect, then
+            # this is the new best hit.
+            if hit_is_perfect and not current_best_is_perfect:
+                best_hits[cluster_name] = this_hit
+
+            # If this hit is perfect and the current best is also perfect, then
+            # this is the new best hit only if it is longer.
+            elif hit_is_perfect and current_best_is_perfect and len(hit_seq) > current_best_length:
+                best_hits[cluster_name] = this_hit
+
+            # If neither this hit nor the current best are perfect, this is the
+            # new best only if it has the higher bit score.
+            elif not hit_is_perfect and not current_best_is_perfect and bit_score > current_best_bit_score:
+                best_hits[cluster_name] = this_hit
 
     return best_hits
 
