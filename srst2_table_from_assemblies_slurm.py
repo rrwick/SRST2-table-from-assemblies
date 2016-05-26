@@ -58,14 +58,14 @@ def main():
         output_name_and_path = os.path.join(output_path, assembly_name + '_' + output_name)
     
         cmd = '#!/bin/bash'
-        cmd += '\n#SBATCH -p main'
+        cmd += '\n#SBATCH -p sysgen'
         cmd += '\n#SBATCH --job-name=srst2_table_' + assembly_name
         cmd += '\n#SBATCH --ntasks=1'
         cmd += '\n#SBATCH --mem-per-cpu=' + args.memory
         cmd += '\n#SBATCH --time=' + args.walltime
         cmd += '\ncd ' + args.rundir
-        cmd += '\nmodule load blast+-intel'
-        cmd += '\nmodule load python-gcc'
+        cmd += '\nmodule load BLAST+/2.2.30-vlsci_intel-2015.08.25-Python-2.7.10'
+        cmd += '\nmodule load Python/2.7.10-vlsci_intel-2015.08.25-SG'
         cmd += '\n' + script_path
         cmd += ' --assemblies ' + assembly_filename
         cmd += ' --gene_db ' + args.gene_db
