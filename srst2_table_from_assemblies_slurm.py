@@ -14,6 +14,8 @@ from __future__ import division
 import sys
 import argparse
 import os
+
+sys.dont_write_bytecode = True
 from srst2_table_from_assemblies import check_file_exists
 from srst2_table_from_assemblies import remove_extension_from_assembly_file
 from srst2_table_from_assemblies import check_algorithm
