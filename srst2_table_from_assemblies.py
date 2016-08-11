@@ -5,6 +5,9 @@ SRST2 results from assemblies
 This is a tool to screen for genes in a collection of assemblies and output
 the results in a table which mimics those produced by SRST2.
 
+Subject sequences (the BLAST database): the assembly
+Query sequences: a gene database
+
 Author: Ryan Wick
 email: rrwick@gmail.com
 '''
@@ -48,7 +51,7 @@ def main():
     for assembly in args.assemblies:
         assembly_name = remove_extension_from_assembly_file(os.path.basename(assembly))
         all_results[assembly_name] = {}
-        blast_results = blast_assembly(assembly, args.gene_db, args.algorithm, unique_allele_symbols)
+        blast_results = blast_assembly(assembly, args.gene_db, args.algorithm, unique_allele_symbols, args.mlst)
         filtered_blast_results = filter_blast_results(blast_results, args.min_coverage, args.max_divergence)
         best_hits = get_best_match_for_each_cluster(filtered_blast_results)
         for cluster, best_hit in best_hits.iteritems():
@@ -125,10 +128,11 @@ def get_arguments():
     parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file')
     parser.add_argument('--report_all_consensus', type=str, required=False, help='Report all found alleles in this file')
     parser.add_argument('--algorithm', action="store", help="blast algorithm (blastn)", default="blastn")
+    parser.add_argument('--mlst', action='store_true', required=False, help="Turn it on to find MLST genes")
     return parser.parse_args()
 
 
-def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols):
+def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols, mlst_run):
     check_file_exists(assembly)
 
     # Make the BLAST database if it doesn't already exist.
@@ -170,8 +174,8 @@ def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols):
         cluster_name = query_name_parts[1]
         allele_name = query_name_parts[2]
         allele_id = query_name_parts[3]
-
-        if not unique_allele_symbols:
+        
+        if not unique_allele_symbols and not mlst_run:
             allele_name += '_' + allele_id
 
         blast_results.append((query_name, cluster_name, allele_name, identity, coverage, hit_seq, bit_score))
