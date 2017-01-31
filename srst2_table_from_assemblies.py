@@ -135,7 +135,7 @@ def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols):
     # If the contigs are in a gz file, make a temporary decompressed FASTA file.
     if get_compression_type(assembly) == 'gz':
         new_assembly = assembly + '_temp_decompress.fasta'
-        decompress_file(contigs, new_contigs)
+        decompress_file(assembly, new_assembly)
         assembly = new_assembly
         temp_decompress = True
     else:
