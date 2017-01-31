@@ -188,7 +188,7 @@ def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols):
 
     # If we've been working on a temporary decompressed file, delete it now.
     if temp_decompress:
-        os.remove(contigs)
+        os.remove(assembly)
 
     return blast_results
 
