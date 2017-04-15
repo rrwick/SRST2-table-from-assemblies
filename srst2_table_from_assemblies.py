@@ -18,6 +18,7 @@ import sys
 import argparse
 import subprocess
 import os
+import gzip
 from distutils import spawn
 
 
@@ -134,6 +135,15 @@ def get_arguments():
 
 def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols, mlst_run):
     check_file_exists(assembly)
+    
+    # If the contigs are in a gz file, make a temporary decompressed FASTA file.
+    if get_compression_type(assembly) == 'gz':
+        new_assembly = assembly + '_temp_decompress.fasta'
+        decompress_file(assembly, new_assembly)
+        assembly = new_assembly
+        temp_decompress = True
+    else:
+        temp_decompress = False
 
     # Make the BLAST database if it doesn't already exist.
     if not os.path.isfile(assembly + ".nin"):
@@ -179,6 +189,10 @@ def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols, mlst_run
             allele_name += '_' + allele_id
 
         blast_results.append((query_name, cluster_name, allele_name, identity, coverage, hit_seq, bit_score))
+        
+    # If we've been working on a temporary decompressed file, delete it now.
+    if temp_decompress:
+        os.remove(assembly)
 
     return blast_results
 
@@ -290,6 +304,33 @@ def determine_allele_symbol_uniqueness(gene_db_filename):
         allele_names.add(allele_name)
     return True
 
+def get_compression_type(filename):
+    """
+    Attempts to guess the compression (if any) on a file using the first few bytes.
+    http://stackoverflow.com/questions/13044562
+    """
+    magic_dict = {'gz': (b'\x1f', b'\x8b', b'\x08'),
+                  'bz2': (b'\x42', b'\x5a', b'\x68'),
+                  'zip': (b'\x50', b'\x4b', b'\x03', b'\x04')}
+    max_len = max(len(x) for x in magic_dict)
+
+    unknown_file = open(filename, 'rb')
+    file_start = unknown_file.read(max_len)
+    unknown_file.close()
+    compression_type = 'plain'
+    for file_type, magic_bytes in magic_dict.items():
+        if file_start.startswith(magic_bytes):
+            compression_type = file_type
+    if compression_type == 'bz2':
+        sys.exit('cannot use bzip2 format - use gzip instead')
+    if compression_type == 'zip':
+        sys.exit('cannot use zip format - use gzip instead')
+    return compression_type
+
+def decompress_file(in_file, out_file):
+    with gzip.GzipFile(in_file, 'rb') as i, open(out_file, 'wb') as o:
+        s = i.read()
+        o.write(s)
 
 if __name__ == '__main__':
     main()

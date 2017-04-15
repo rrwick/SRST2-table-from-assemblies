@@ -24,8 +24,8 @@ srst2_table_from_assemblies.py [-h]
 * `--output`: The output prefix for the table of results.  The table's full name will be [prefix]__genes__[gene_db]__results.txt
 * `--min_coverage`: the minimum allowed BLAST hit percent coverage for an allele (default = 90).
 * `--max_divergence`: the maximum allowed percent divergence between a BLAST hit and an allele sequence (default = 10).
-* `--report_new_consensus`: When matching alleles are not found, report the found alleles in this file.
-* `--report_all_consensus`: Report all found alleles in this file.
+* `--report_new_consensus`: When matching alleles are not found, report the found alleles in this file (default: do not save allele sequences to file).
+* `--report_all_consensus`: Report all found alleles in this file (default: do not save allele sequences to file).
 * `--algorithm`: which BLAST+ algorithm to use (`blastn`, `blastn-short`, `megablast` or `dc-megablast`, default = `blastn`).
 
 ### Example command
