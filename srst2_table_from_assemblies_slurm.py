@@ -78,6 +78,8 @@ def main():
             cmd += ' --max_divergence ' + str(args.max_divergence)
         if args.algorithm:
             cmd += ' --algorithm ' + args.algorithm
+        if args.mlst:
+            cmd += ' --mlst'
 
         if args.report_new_consensus:
             new_consensus_path, new_consensus_name = os.path.split(args.report_new_consensus)
@@ -113,6 +115,7 @@ def get_arguments():
     parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file (will be combined with assembly identifiers)')
     parser.add_argument('--report_all_consensus', type=str, required=False, help='Report all found alleles in this file (will be combined with assembly identifiers)')
     parser.add_argument('--algorithm', action="store", help="blast algorithm (blastn)")
+    parser.add_argument('--mlst', action='store_true', required=False, help="Turn it on to find MLST genes")
     return parser.parse_args()
 
 

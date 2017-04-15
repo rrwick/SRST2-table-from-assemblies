@@ -5,6 +5,9 @@ SRST2 results from assemblies
 This is a tool to screen for genes in a collection of assemblies and output
 the results in a table which mimics those produced by SRST2.
 
+Subject sequences (the BLAST database): the assembly
+Query sequences: a gene database
+
 Author: Ryan Wick
 email: rrwick@gmail.com
 '''
@@ -49,7 +52,7 @@ def main():
     for assembly in args.assemblies:
         assembly_name = remove_extension_from_assembly_file(os.path.basename(assembly))
         all_results[assembly_name] = {}
-        blast_results = blast_assembly(assembly, args.gene_db, args.algorithm, unique_allele_symbols)
+        blast_results = blast_assembly(assembly, args.gene_db, args.algorithm, unique_allele_symbols, args.mlst)
         filtered_blast_results = filter_blast_results(blast_results, args.min_coverage, args.max_divergence)
         best_hits = get_best_match_for_each_cluster(filtered_blast_results)
         for cluster, best_hit in best_hits.iteritems():
@@ -126,11 +129,21 @@ def get_arguments():
     parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file')
     parser.add_argument('--report_all_consensus', type=str, required=False, help='Report all found alleles in this file')
     parser.add_argument('--algorithm', action="store", help="blast algorithm (blastn)", default="blastn")
+    parser.add_argument('--mlst', action='store_true', required=False, help="Turn it on to find MLST genes")
     return parser.parse_args()
 
 
-def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols):
+def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols, mlst_run):
     check_file_exists(assembly)
+    
+    # If the contigs are in a gz file, make a temporary decompressed FASTA file.
+    if get_compression_type(assembly) == 'gz':
+        new_assembly = assembly + '_temp_decompress.fasta'
+        decompress_file(assembly, new_assembly)
+        assembly = new_assembly
+        temp_decompress = True
+    else:
+        temp_decompress = False
 
     # If the contigs are in a gz file, make a temporary decompressed FASTA file.
     if get_compression_type(assembly) == 'gz':
@@ -180,11 +193,15 @@ def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols):
         cluster_name = query_name_parts[1]
         allele_name = query_name_parts[2]
         allele_id = query_name_parts[3]
-
-        if not unique_allele_symbols:
+        
+        if not unique_allele_symbols and not mlst_run:
             allele_name += '_' + allele_id
 
         blast_results.append((query_name, cluster_name, allele_name, identity, coverage, hit_seq, bit_score))
+        
+    # If we've been working on a temporary decompressed file, delete it now.
+    if temp_decompress:
+        os.remove(assembly)
 
     # If we've been working on a temporary decompressed file, delete it now.
     if temp_decompress:
@@ -300,6 +317,33 @@ def determine_allele_symbol_uniqueness(gene_db_filename):
         allele_names.add(allele_name)
     return True
 
+def get_compression_type(filename):
+    """
+    Attempts to guess the compression (if any) on a file using the first few bytes.
+    http://stackoverflow.com/questions/13044562
+    """
+    magic_dict = {'gz': (b'\x1f', b'\x8b', b'\x08'),
+                  'bz2': (b'\x42', b'\x5a', b'\x68'),
+                  'zip': (b'\x50', b'\x4b', b'\x03', b'\x04')}
+    max_len = max(len(x) for x in magic_dict)
+
+    unknown_file = open(filename, 'rb')
+    file_start = unknown_file.read(max_len)
+    unknown_file.close()
+    compression_type = 'plain'
+    for file_type, magic_bytes in magic_dict.items():
+        if file_start.startswith(magic_bytes):
+            compression_type = file_type
+    if compression_type == 'bz2':
+        sys.exit('cannot use bzip2 format - use gzip instead')
+    if compression_type == 'zip':
+        sys.exit('cannot use zip format - use gzip instead')
+    return compression_type
+
+def decompress_file(in_file, out_file):
+    with gzip.GzipFile(in_file, 'rb') as i, open(out_file, 'wb') as o:
+        s = i.read()
+        o.write(s)
 
 def get_compression_type(filename):
     """
