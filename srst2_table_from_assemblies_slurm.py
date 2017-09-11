@@ -1,123 +1,123 @@
 #!/usr/bin/env python
-'''
+"""
 SRST2 results from assemblies
 
 This is a tool to screen for genes in a collection of assemblies and output
 the results in a table which mimics those produced by SRST2.
 
-Author: Ryan Wick
-email: rrwick@gmail.com
-'''
+Python version: 3
 
-from __future__ import print_function
-from __future__ import division
+Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
+Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
+Latest edition: 9-10 Sep 2017
+"""
+
 import sys
+sys.dont_write_bytecode = True  # Do not write .pyc files on the import of source modules.
 import argparse
 import os
+from srst2_table_from_assemblies import check_file_exists, check_algorithm, rchop
 
-sys.dont_write_bytecode = True
-from srst2_table_from_assemblies import check_file_exists
-from srst2_table_from_assemblies import remove_extension_from_assembly_file
-from srst2_table_from_assemblies import check_algorithm
+
+def get_arguments():
+    parser = argparse.ArgumentParser(description = "SRST2 table from assemblies - SLURM job generator")
+    
+    # SLURM arguments
+    parser.add_argument("--script", type = str, required = False, default = "./srst2_table_from_assemblies.py", help = "path to srst2_table_from_assemblies.py, if not in the current directory or this script's directory")
+    parser.add_argument("--walltime", type = str, required = False, default = "0-0:30:0", help = "wall time for each job bundle (default: 0-0:30:0 = 30 min)")
+    parser.add_argument("--memory", type = str, required = False, default = "512", help = "memory assigned to every job (default: 512 MB)")
+    parser.add_argument("--partition", type = str, required = False, default = "main", help = "name of the queue partition (default: main)")
+    parser.add_argument("--bundle_name_prefix", type = str, required = False, default = "genotyping", help = "prefix for the name of every bundle of SLURM jobs (default: genotyping)")
+    parser.add_argument("--bundle_size", type = int, required = False, default = 16, help = "number of individual jobs per bundle (default: 16)")
+    parser.add_argument("--outdir", type = str, required = False, default = os.getcwd(), help = "output directory for results (default: current dir)")
+    parser.add_argument("--dont_run", action = "store_true", required = False, help = "Flag it to only print SLURM scripts without submission")
+    
+    # script arguments
+    parser.add_argument("--assemblies", nargs = "+", type = str, required = True, help = "Fasta file/s for assembled contigs")
+    parser.add_argument("--gene_db", type = str, required = True, help = "Fasta file for gene databases")
+    parser.add_argument('--algorithm', type = str, required = False, default = "megablast", help="blast algorithm (megablast)")
+    parser.add_argument("--prefix", type = str, required = False, default = "BLAST", help = "Output prefix for the table of results")
+    parser.add_argument("--suffix", type = str, required = False, default = ".fasta", help = "Characters to be chopped off from the end of every assembly name in order to get a sample name")
+    parser.add_argument("--other_args", type = str, required = False, help = "A single string for other arguments to be passed directly to the srst2_table_from_assemblies script")
+    return parser.parse_args()
 
 
 def main():
     args = get_arguments()
+    run = not args.dont_run
 
+    # Environmental settings ###############
     check_file_exists(args.gene_db)
     args.gene_db = os.path.abspath(args.gene_db)
-
     if args.algorithm:
         check_algorithm(args.algorithm)
-
-    if not args.rundir:
-        args.rundir = os.getcwd()
-
     if args.script:
-        if args.script.endswith('srst2_table_from_assemblies.py'):
+        if args.script.endswith("srst2_table_from_assemblies.py"):
             script_path = args.script
         else:
-            script_path = os.path.join(args.script, 'srst2_table_from_assemblies.py')
+            script_path = os.path.join(args.script, "srst2_table_from_assemblies.py")
         check_file_exists(script_path)
     else:
-        script_path_cwd = os.path.join(os.getcwd(), 'srst2_table_from_assemblies.py')
+        script_path_cwd = os.path.join(os.getcwd(), "srst2_table_from_assemblies.py")
         if os.path.isfile(script_path_cwd):
             script_path = script_path_cwd
         else:
-            script_path_file_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'srst2_table_from_assemblies.py')
+            script_path_file_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "srst2_table_from_assemblies.py")
             if os.path.isfile(script_path_file_directory):
                 script_path = script_path_file_directory
             else:
-                print('Error: could not find srst2_table_from_assemblies.py')
-                quit()
+                sys.exit("Error: could not find srst2_table_from_assemblies.py")
 
+    # Generate and submit a SLURM script for each assembly ###############
+    """
+    We use job bundles to solve the problem of losing outputs when a large number of individual short jobs
+    are submitted to the SLURM system. The Melbourne Bioinformatics (https://www.melbournebioinformatics.org
+    .au/documentation/running_jobs/slurm_x86/) suggests to use job bundles to address this problem. In this
+    method, the total amount of memory required for each bundle equals args.memory * args.bundle_size with a
+    unit of MB.
+    """
+    bundle_count = 0
+    job_count = 0
+    job_left = len(args.assemblies)
+    tasks = ""
     for assembly_filename in args.assemblies:
-        assembly_name = remove_extension_from_assembly_file(os.path.basename(assembly_filename))
-
-        output_path, output_name = os.path.split(args.output)
-        if not output_path:
-            output_path = args.rundir
-        output_name_and_path = os.path.join(output_path, assembly_name + '_' + output_name)
-    
-        cmd = '#!/bin/bash'
-        cmd += '\n#SBATCH -p sysgen'
-        cmd += '\n#SBATCH --job-name=srst2_table_' + assembly_name
-        cmd += '\n#SBATCH --ntasks=1'
-        cmd += '\n#SBATCH --mem-per-cpu=' + args.memory
-        cmd += '\n#SBATCH --time=' + args.walltime
-        cmd += '\ncd ' + args.rundir
-        cmd += '\nmodule load BLAST+/2.2.30-vlsci_intel-2015.08.25-Python-2.7.10'
-        cmd += '\nmodule load Python/2.7.10-vlsci_intel-2015.08.25-SG'
-        cmd += '\n' + script_path
-        cmd += ' --assemblies ' + assembly_filename
-        cmd += ' --gene_db ' + args.gene_db
-        cmd += ' --output ' + output_name_and_path
-        if args.min_coverage:
-            cmd += ' --min_coverage ' + str(args.min_coverage)
-        if args.max_divergence:
-            cmd += ' --max_divergence ' + str(args.max_divergence)
-        if args.algorithm:
-            cmd += ' --algorithm ' + args.algorithm
-        if args.mlst:
-            cmd += ' --mlst'
-
-        if args.report_new_consensus:
-            new_consensus_path, new_consensus_name = os.path.split(args.report_new_consensus)
-            if not new_consensus_path:
-                new_consensus_path = args.rundir
-            new_consensus_name_and_path = os.path.join(new_consensus_path, assembly_name + '_' + new_consensus_name)
-            cmd += ' --report_new_consensus ' + new_consensus_name_and_path
-        if args.report_all_consensus:
-            all_consensus_path, all_consensus_name = os.path.split(args.report_all_consensus)
-            if not all_consensus_path:
-                all_consensus_path = args.rundir
-            all_consensus_name_and_path = os.path.join(all_consensus_path, assembly_name + '_' + all_consensus_name)
-            cmd += ' --report_all_consensus ' + all_consensus_name_and_path
-
-        print(cmd)
-        print()
-        os.system('echo "' + cmd + '" | sbatch')
-        print()
+        assembly_name = rchop(os.path.basename(assembly_filename), args.suffix)
+        
+        # make a the command line for a single task
+        tasks += "srun --nodes=1 --ntasks=1 --cpus-per-task=1 python " + script_path
+        tasks += " --assemblies " + assembly_filename
+        tasks += " --gene_db " + args.gene_db
+        tasks += " --outdir " + args.outdir
+        tasks += " --algorithm " + args.algorithm
+        """
+        The following concatenation of assembly_name and args.prefix is essential for the "srst2 --prev_output" command
+        to run properly, otherwise, it reports an error that "Couldn't decide what to do with file results".
+        """
+        tasks += " --prefix " + assembly_name + "_" + args.prefix  # to comply with the SRST2 convention: sample_prefix__[database name]...
+        tasks += " " + args.other_args + "\n"
+        job_count += 1
+        job_left -= 1
+        
+        # submit a bundle when there are args.bundle_size jobs
+        if job_count == args.bundle_size or job_left == 0:
+            bundle_count += 1
+            bundle_cmd = "#!/bin/bash"
+            bundle_cmd += "\n#SBATCH --partition=" + args.partition
+            bundle_cmd += "\n#SBATCH --job-name=" + args.bundle_name_prefix + "_" + str(bundle_count)
+            bundle_cmd += "\n#SBATCH --ntasks=" + str(job_count)
+            bundle_cmd += "\n#SBATCH --cpus-per-task=1"
+            bundle_cmd += "\n#SBATCH --mem-per-cpu=" + args.memory  # memory per task (CPU) when there has to be one processor (CPU) per task
+            bundle_cmd += "\n#SBATCH --time=" + args.walltime
+            bundle_cmd += "\nmodule load BLAST+/2.2.30-vlsci_intel-2015.08.25"
+            bundle_cmd += "\nmodule load Python/3.5.2-vlsci_intel-2015.08.25\n"
+            bundle_cmd += tasks + "wait\n"  # terminate this bundle only when all tasks end
+            if run:
+                os.system("echo '" + bundle_cmd + "' | sbatch")  # submit this bundle of jobs
+            print(bundle_cmd)  # put this and the following two commands after the submission to increase the interval between two submissions
+            job_count = 0
+            tasks = ""
+            sleep = 1  # futher delay the submission process in order to give the scheduler enough time to process all commands
 
 
-
-def get_arguments():
-    parser = argparse.ArgumentParser(description='SRST2 table from assemblies - SLURM job generator')
-    parser.add_argument('--walltime', type=str, required=False, help='wall time (default 0-0:30 = 30 min)', default='0-0:30')
-    parser.add_argument('--memory', type=str, required=False, help='mem (default 4096 = 4gb)', default='4096')
-    parser.add_argument('--rundir', type=str, required=False, help='directory to run in (default current dir)')
-    parser.add_argument('--script', type=str, required=False, help="path to srst2_table_from_assemblies.py, if not in current directory or this script's directory")
-    parser.add_argument('--assemblies', nargs='+', type=str, required=True, help='Fasta file/s for assembled contigs')
-    parser.add_argument('--gene_db', type=str, required=True, help='Fasta file for gene databases')
-    parser.add_argument('--output', type=str, required=True, help='Identifier for outputs (will be combined with assembly identifiers)')
-    parser.add_argument('--min_coverage', type=float, required=False, help='Minimum %%coverage cutoff for gene reporting (default 90)')
-    parser.add_argument('--max_divergence', type=float, required=False, help='Maximum %%divergence cutoff for gene reporting (default 10)')
-    parser.add_argument('--report_new_consensus', type=str, required=False, help='When matching alleles are not found, report the found alleles in this file (will be combined with assembly identifiers)')
-    parser.add_argument('--report_all_consensus', type=str, required=False, help='Report all found alleles in this file (will be combined with assembly identifiers)')
-    parser.add_argument('--algorithm', action="store", help="blast algorithm (blastn)")
-    parser.add_argument('--mlst', action='store_true', required=False, help="Turn it on to find MLST genes")
-    return parser.parse_args()
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

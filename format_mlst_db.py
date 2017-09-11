@@ -1,4 +1,4 @@
-"""
+'''
 This script reformats a standard database of MLST alleles as per the format for genotyping in SRST2.
 Run this script before using Ryan's script srst2_table_from_assemblies.py (https://github.com/rrwick/SRST2-table-from-assemblies)
 for sequence typing.
@@ -7,11 +7,12 @@ Usage:
     cat mlst/*.fas | python reformat_mlst_db.py > srst2_mlst.fna
     cat mlst/*.fas | python reformat_mlst_db.py '-' > srst2_mlst.fna  # when the MLST delimiter is a dash
 
-Author: Yu Wan (wanyuac@gmail.com, GitHub: https://github.com/wanyuac)
-Edition history: 11/8/2016
 Python v3.5.2 (This is my first script in Python 3)
-License: GNU GPL 2.1
-"""
+
+Copyright (C) 2016-2017 Yu Wan <wanyuac@gmail.com, GitHub: https://github.com/wanyuac>
+Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
+Edition history: 11/8/2016
+'''
 
 import sys
 from Bio import SeqIO
@@ -43,6 +44,6 @@ def main():
         seq.id = "__".join([str(gene_list[gene]), gene, allele_id, str(seq_num)])  # assign a new sequence ID
         print(seq.format("fasta"))  # write the current sequence to the stdout
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
     

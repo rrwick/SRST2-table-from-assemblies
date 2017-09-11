@@ -1,32 +1,64 @@
-# SRST2 table from assemblies
+# Gene screen for haploid genome assemblies
 
-This is a tool for conducting a gene screen on assemblies.  It produces a table which mimics the format of [SRST2](https://github.com/katholt/srst2)'s compiled results.
+This is a tool for conducting a gene screen on assemblies. It produces a table in the format of [SRST2](https://github.com/katholt/srst2)'s compiled results.
 
-It can be useful when there are some samples for which you have reads and other samples for which you only have assemblies.  You can use SRST2 to conduct a gene screen on the reads and this script to conduct a gene screen on the assemblies.  The results can then be combined using SRST2.  Note that if you have both reads and assemblies, it is preferrable to use SRST2 on the reads instead of this script, as SRST2 has better sensitivity.
+It is particularly useful when you want to screen for genes in samples where some of them have reads available while the others only have assemblies. For reads, you can use SRST2 to perform the gene screen; and for assemblies, you may use this script to produce results that can be compiled with those obtained from reads. Nonetheless, note that if you have both reads and assemblies for the same sample, it is preferable to use SRST2 on the reads instead of using this script on assemblies, as SRST2 has better sensitivity (variants may get lost for various reasons during the assembly process).
 
-It uses [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) to conduct the gene searches and requires BLAST+ to be installed.
+This tool is Python 2 and 3 compatible. It uses [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) to conduct the nucleotide-level gene searches and hence requires BLAST+ to be installed.
 
-## Usage:
+## Arguments and options  
+
 ```
-srst2_table_from_assemblies.py [-h]
-                               --assemblies ASSEMBLIES [ASSEMBLIES ...]
-                               --gene_db GENE_DB
-                               --output OUTPUT
-                               [--min_coverage MIN_COVERAGE]
-                               [--max_divergence MAX_DIVERGENCE]
-                               [--report_new_consensus REPORT_NEW_CONSENSUS]
-                               [--report_all_consensus REPORT_ALL_CONSENSUS]
-                               [--algorithm ALGORITHM]
+python srst2_table_from_assemblies.py -h
+usage: srst2_table_from_assemblies.py [-h] --assemblies ASSEMBLIES
+                                      [ASSEMBLIES ...] --gene_db GENE_DB
+                                      [--prefix PREFIX] [--suffix SUFFIX]
+                                      [--outdir OUTDIR]
+                                      [--min_coverage MIN_COVERAGE]
+                                      [--max_divergence MAX_DIVERGENCE]
+                                      [--report_new_consensus]
+                                      [--report_all_consensus]
+                                      [--algorithm ALGORITHM] [--mlst]
+                                      [--incl_alt]
+                                      [--max_overlapping_nt MAX_OVERLAPPING_NT]
+                                      [--del_blast]
+
+  --min_coverage MIN_COVERAGE
+                        Minimum %coverage cutoff for gene reporting (default
+                        90)
+  --max_divergence MAX_DIVERGENCE
+                        Maximum %divergence cutoff for gene reporting (default
+                        10)
+  --report_new_consensus
+                        Configure it to save consensus sequences of variants
+  --report_all_consensus
+                        Configure it to save all consensus sequences
+  --algorithm ALGORITHM
+                        blast algorithm (blastn)
+  --mlst                Turn it on to find MLST genes
+  --incl_alt            Flag it to include all putative alternative calls for
+                        each allele
+  --max_overlapping_nt MAX_OVERLAPPING_NT
+                        Maximal number of overlapping nucleotides allowed to
+                        treat two hits as physically separate
+  --del_blast           Flag it to delete the text file of BLAST outputs
 ```
 
 * `--assemblies`: FASTA files of all assemblies to screen.  The sample name will be taken from the assembly filename (without the `.fasta` or `.fa` extension).  If a BLAST database does not exist for each assembly (`.nhr`, `.nin` and `.nsq` files), then it will be made using `makeblastdb`.  Since doing so creates new files, you will need write permission to the directory of the assembly.
 * `--gene_db`: a gene database to search for in [SRST2 format](https://github.com/katholt/srst2#generating-srst2-compatible-clustered-database-from-raw-sequences).
-* `--output`: The output prefix for the table of results.  The table's full name will be [prefix]__genes__[gene_db]__results.txt
+* `--prefix`: Output prefix for the table of results. It works in the same way as SRST2.
+* `--suffix`: Characters to be chopped off from the end of every assembly name in order to get a sample name. For example, ''strain'' is extracted from the file name ''strain_spades.fasta'' given `--suffix '_spades.fasta'`.  
+* `--outdir`: Output directory for the table of results.
 * `--min_coverage`: the minimum allowed BLAST hit percent coverage for an allele (default = 90).
 * `--max_divergence`: the maximum allowed percent divergence between a BLAST hit and an allele sequence (default = 10).
 * `--report_new_consensus`: When matching alleles are not found, report the found alleles in this file (default: do not save allele sequences to file).
 * `--report_all_consensus`: Report all found alleles in this file (default: do not save allele sequences to file).
 * `--algorithm`: which BLAST+ algorithm to use (`blastn`, `blastn-short`, `megablast` or `dc-megablast`, default = `blastn`).
+
+## Outputs
+The table's full name will be [prefix]__genes__[gene_db]__results.txt
+
+## Examples
 
 ### Example command
 
@@ -74,4 +106,4 @@ Another script, `srst2_table_from_assemblies_slurm.py`, is included to generate 
 
 ## License
 
-GNU General Public License, version 3
+[Apache license, version 2](http://www.apache.org/licenses/LICENSE-2.0)
