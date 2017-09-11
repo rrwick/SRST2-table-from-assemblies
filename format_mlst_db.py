@@ -10,7 +10,7 @@ Usage:
 Python versions 2.7 and 3 compatible (This is my first script in Python 3)
 
 Copyright (C) 2016-2017 Yu Wan <wanyuac@gmail.com, GitHub: https://github.com/wanyuac>
-Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
+Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
 First edition: 11 Aug 2016, latest edition: 11 Sep 2017
 """
 

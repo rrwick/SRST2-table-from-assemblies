@@ -6,7 +6,7 @@ This is a module providing classes to process BLAST outputs. It works for the sc
 Python versions 2.7 and 3 compatible
 
 Copyright (C) 2017 Yu Wan <wanyuac@gmail.com, https://github.com/wanyuac>
-Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
+Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
 First and the latest edition: 6-9 Sep 2017
 """
 

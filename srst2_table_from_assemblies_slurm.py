@@ -8,7 +8,7 @@ the results in a table which mimics those produced by SRST2.
 Python versions 2.7 and 3 compatible.
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
-Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
+Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
 Latest edition: 9-10 Sep 2017
 """
 
