@@ -1,4 +1,4 @@
-'''
+"""
 This script reformats a standard database of MLST alleles as per the format for genotyping in SRST2.
 Run this script before using Ryan's script srst2_table_from_assemblies.py (https://github.com/rrwick/SRST2-table-from-assemblies)
 for sequence typing.
@@ -7,17 +7,19 @@ Usage:
     cat mlst/*.fas | python reformat_mlst_db.py > srst2_mlst.fna
     cat mlst/*.fas | python reformat_mlst_db.py '-' > srst2_mlst.fna  # when the MLST delimiter is a dash
 
-Python v3.5.2 (This is my first script in Python 3)
+Python versions 2.7 and 3 compatible (This is my first script in Python 3)
 
 Copyright (C) 2016-2017 Yu Wan <wanyuac@gmail.com, GitHub: https://github.com/wanyuac>
 Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
-Edition history: 11/8/2016
-'''
+First edition: 11 Aug 2016, latest edition: 11 Sep 2017
+"""
 
+from __future__ import print_function
 import sys
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
+
 
 def get_mlst_delimiter():
     if len(sys.argv) > 1:
@@ -25,6 +27,7 @@ def get_mlst_delimiter():
     else:
         delimiter = "_"  # the default
     return delimiter
+
 
 def main():
     mlst_delim = get_mlst_delimiter()

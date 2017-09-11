@@ -8,13 +8,15 @@ This script is able to process multiple input FASTA files.
 Subject sequences (the BLAST database): the assembly
 Query sequences: an SRST2-formatted reference gene database
 
-Python version: 3
+Python versions 2.7 and 3 compatible.
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
 Latest edition: 8-9 Sep 2017
 """
 
+from __future__ import print_function
+from __future__ import division
 import os
 import sys
 sys.dont_write_bytecode = True  # Do not write .pyc files (in the __pycache__ directory) on the import of source modules. Use it before "from parseBLAST import ...".

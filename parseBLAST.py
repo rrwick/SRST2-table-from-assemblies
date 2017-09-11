@@ -3,7 +3,7 @@
 """
 This is a module providing classes to process BLAST outputs. It works for the script srst2_table_from_assemblies.py.
 
-Python version: 3
+Python versions 2.7 and 3 compatible
 
 Copyright (C) 2017 Yu Wan <wanyuac@gmail.com, https://github.com/wanyuac>
 Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)

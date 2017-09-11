@@ -5,13 +5,14 @@ SRST2 results from assemblies
 This is a tool to screen for genes in a collection of assemblies and output
 the results in a table which mimics those produced by SRST2.
 
-Python version: 3
+Python versions 2.7 and 3 compatible.
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public License version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
 Latest edition: 9-10 Sep 2017
 """
 
+from __future__ import print_function
 import sys
 sys.dont_write_bytecode = True  # Do not write .pyc files on the import of source modules.
 import argparse
@@ -108,8 +109,8 @@ def main():
             bundle_cmd += "\n#SBATCH --cpus-per-task=1"
             bundle_cmd += "\n#SBATCH --mem-per-cpu=" + args.memory  # memory per task (CPU) when there has to be one processor (CPU) per task
             bundle_cmd += "\n#SBATCH --time=" + args.walltime
-            bundle_cmd += "\nmodule load BLAST+/2.2.30-vlsci_intel-2015.08.25"
-            bundle_cmd += "\nmodule load Python/3.5.2-vlsci_intel-2015.08.25\n"
+            bundle_cmd += "\nmodule load BLAST+/2.2.30-vlsci_intel-2015.08.25"  # change to your own module names
+            bundle_cmd += "\nmodule load Python/2.7.10-vlsci_intel-2015.08.25\n"
             bundle_cmd += tasks + "wait\n"  # terminate this bundle only when all tasks end
             if run:
                 os.system("echo '" + bundle_cmd + "' | sbatch")  # submit this bundle of jobs
