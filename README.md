@@ -8,7 +8,7 @@ Although this tool is designed for screening genes in haploid organisms, it is i
 
 Dependency: this tool is Python 2 and 3 compatible. It requires a local [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) installation to conduct nucleotide-level gene searches.
 
-Citation: Ryan R. Wick, Yu Wan, _gene\_screen\_in\_assemblies_, https://github.com/wanyuac/screen\_genes\_in\_assemblies.git, doi: 10.5281/zenodo.893164.
+Citation: Ryan R. Wick, Yu Wan, _gene\_screen\_in\_assemblies_, https://github.com/wanyuac/screen_genes_in_assemblies.git, doi: 10.5281/zenodo.893164.
 
 ## Arguments and options
 
