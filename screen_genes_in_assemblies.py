@@ -1,14 +1,16 @@
 #!/usr/bin/env python
+
 """
-SRST2 results from assemblies (contigs)
+Screening genes in genome assemblies (contigs) and producing an SRST2-formatted gene table.
 
 This is a tool to screen for genes in a collection of contigs and output the results in a table which mimics those produced by SRST2.
 This script is able to process multiple input FASTA files.
 
-Subject sequences (the BLAST database): the assembly
-Query sequences: an SRST2-formatted reference gene database
+Subject sequences (serves as a BLAST database): a collection of genome assemblies in the FASTA format
+Query sequences: a reference gene database in the SRST2-compatible format
 
 Python versions 2.7 and 3 compatible.
+Previous name: srst2_table_from_assemblies.py
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
@@ -29,7 +31,7 @@ from parseBLAST import Hit, Hap, Cluster, Assembly  # for classes that process B
 
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description = "SRST2 table from assemblies")
+    parser = argparse.ArgumentParser(description = "Screen genes in assemblies")
     parser.add_argument("--assemblies", nargs = "+", type = str, required = True, help = "Fasta file/s for assembled contigs")
     parser.add_argument("--gene_db", type = str, required = True, help = "Fasta file for gene databases")
     parser.add_argument("--prefix", type = str, required = False, default = "BLAST", help = "Output prefix for the table of results")

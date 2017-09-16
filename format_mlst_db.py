@@ -1,7 +1,6 @@
 """
 This script reformats a standard database of MLST alleles as per the format for genotyping in SRST2.
-Run this script before using Ryan's script srst2_table_from_assemblies.py (https://github.com/rrwick/SRST2-table-from-assemblies)
-for sequence typing.
+Run this script before using screen_genes_in_assemblies.py to format your MLST database for sequence typing.
 
 Usage:
     cat mlst/*.fas | python reformat_mlst_db.py > srst2_mlst.fna
