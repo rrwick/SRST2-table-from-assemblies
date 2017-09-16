@@ -1,10 +1,14 @@
 # Gene screen for genome assemblies
 
+[![DOI](https://zenodo.org/badge/65195290.svg)](https://zenodo.org/badge/latestdoi/65195290)
+
 This is a tool for conducting a gene screen on assemblies. It produces a table in the format of [SRST2](https://github.com/katholt/srst2)'s compiled results. It is particularly useful when you want to screen for genes in samples where some of them have reads available while the others only have assemblies. For reads, you can use SRST2 to perform the gene screen; and for assemblies, you may use this script to produce results that can be compiled with those obtained from reads. Nonetheless, note that if you have both reads and assemblies for the same sample, it is preferable to use SRST2 on the reads instead of using this script on assemblies, as SRST2 has better sensitivity (variants may get lost for various reasons during the assembly process).
 
 Although this tool is designed for screening genes in haploid organisms, it is in principle applicable to other organisms as well.  
 
 Dependency: this tool is Python 2 and 3 compatible. It requires a local [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) installation to conduct nucleotide-level gene searches.
+
+Citation: Ryan R. Wick, Yu Wan, _gene\_screen\_in\_assemblies_, https://github.com/wanyuac/screen\_genes\_in\_assemblies.git, doi: 10.5281/zenodo.893164.
 
 ## Arguments and options
 
