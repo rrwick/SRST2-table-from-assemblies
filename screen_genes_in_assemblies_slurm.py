@@ -18,7 +18,8 @@ import sys
 sys.dont_write_bytecode = True  # Do not write .pyc files on the import of source modules.
 import argparse
 import os
-from srst2_table_from_assemblies import check_file_exists, check_algorithm, rchop
+import time
+from screen_genes_in_assemblies import check_file_exists, check_algorithm, rchop
 
 
 def get_arguments():
@@ -96,7 +97,7 @@ def main():
         to run properly, otherwise, it reports an error that "Couldn't decide what to do with file results".
         """
         tasks += " --prefix " + assembly_name + "_" + args.prefix  # to comply with the SRST2 convention: sample_prefix__[database name]...
-        tasks += " " + args.other_args + "\n"
+        tasks += " " + args.other_args + " &\n"  # send this task to the background
         job_count += 1
         job_left -= 1
         
@@ -118,7 +119,7 @@ def main():
             print(bundle_cmd)  # put this and the following two commands after the submission to increase the interval between two submissions
             job_count = 0
             tasks = ""
-            sleep = 1  # futher delay the submission process in order to give the scheduler enough time to process all commands
+            time.sleep(1)  # futher delay the submission process in order to give the scheduler enough time to process all commands
 
 
 if __name__ == "__main__":

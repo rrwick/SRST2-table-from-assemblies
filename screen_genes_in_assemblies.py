@@ -207,7 +207,7 @@ def blast_assembly(assembly, gene_db, algorithm, unique_allele_symbols, mlst_run
     else:
         temp_decompress = False
 
-    # Make the BLAST database if it doesn"t already exist.
+    # Make the BLAST database if it doesn't already exist.
     if not os.path.isfile(assembly + ".nin"):
         makeblastdb_command = ["makeblastdb", "-dbtype", "nucl", "-in", assembly]
         process = subprocess.Popen(makeblastdb_command, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
