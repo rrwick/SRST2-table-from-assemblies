@@ -113,7 +113,7 @@ def main():
             bundle_count += 1
             bundle_cmd = "#!/bin/bash\n"
             if args.account != "":
-                bundle_cmd += "\n$SBATCH --account=" + args.account
+                bundle_cmd += "\n#SBATCH --account=" + args.account
             bundle_cmd += "\n#SBATCH --partition=" + args.partition
             bundle_cmd += "\n#SBATCH --job-name=" + args.bundle_name_prefix + "_" + str(bundle_count)
             bundle_cmd += "\n#SBATCH --ntasks=" + str(job_count)
@@ -121,9 +121,9 @@ def main():
             bundle_cmd += "\n#SBATCH --mem-per-cpu=" + args.memory  # memory per task (CPU) when there has to be one processor (CPU) per task
             bundle_cmd += "\n#SBATCH --time=" + args.walltime
             if args.blast != "":
-                bundle_cmd += "\nmodule load " + args.blast + "\n"  # change to your own module names
+                bundle_cmd += "\nmodule load " + args.blast  # change to your own module names
             if args.python != "":
-                bundle_cmd += "\nmodule load " + args.python + "\n"
+                bundle_cmd += "\nmodule load " + args.python
             if args.other_modules != "":
                 add_modules = args.other_modules.split(",")
                 for m in add_modules:
