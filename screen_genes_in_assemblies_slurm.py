@@ -46,7 +46,8 @@ def get_arguments():
     
     # environment settings
     parser.add_argument("--blast", type = str, required = False, default = "", help = "Module name of BLAST")
-    parser.add_argument("--python", type = str, required = False, default = "", help = "Module name of Python")
+    parser.add_argument("--python", type = str, required = False, default = "", help = "Module name of Python")  # load it after BLAST to avoid changing of Python versions in some systems
+    parser.add_argument("--other_modules", type = str, required = False, default = "", help = "Comma-delimited list of modules")
     
     return parser.parse_args()
 
@@ -123,6 +124,10 @@ def main():
                 bundle_cmd += "\nmodule load " + args.blast + "\n"  # change to your own module names
             if args.python != "":
                 bundle_cmd += "\nmodule load " + args.python + "\n"
+            if args.other_modules != "":
+                add_modules = args.other_modules.split(",")
+                for m in add_modules:
+                    bundle_cmd += "\nmodule load " + m + "\n"
             bundle_cmd += tasks + "wait\n"  # terminate this bundle only when all tasks end
             if run:
                 os.system("echo '" + bundle_cmd + "' | sbatch")  # submit this bundle of jobs
