@@ -111,7 +111,7 @@ def main():
         # submit a bundle when there are args.bundle_size jobs
         if job_count == args.bundle_size or job_left == 0:
             bundle_count += 1
-            bundle_cmd = "#!/bin/bash\n"
+            bundle_cmd = "#!/bin/bash"
             if args.account != "":
                 bundle_cmd += "\n#SBATCH --account=" + args.account
             bundle_cmd += "\n#SBATCH --partition=" + args.partition
