@@ -10,7 +10,7 @@ Previous name: srst2_table_from_assemblies_slurm.py
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
-First edition: 9-10 Sep 2017; the latest edition: 17 Nov 2018
+First edition: 9-10 Sep 2017; the latest edition: 18 Nov 2018
 """
 
 from __future__ import print_function
