@@ -43,6 +43,7 @@ def get_arguments():
     parser.add_argument("--prefix", type = str, required = False, default = "BLAST", help = "Output prefix for the table of results")
     parser.add_argument("--suffix", type = str, required = False, default = ".fasta", help = "Characters to be chopped off from the end of every assembly name in order to get a sample name")
     parser.add_argument("--other_args", type = str, required = False, help = "A single string consisting of other arguments to be passed directly to screen_genes_in_assemblies.py")
+    parser.add_argument("--serial", action = "store_true", required = False, help = "Run jobs within the same bunch in a serial manner.")
     
     # environment settings
     parser.add_argument("--blast", type = str, required = False, default = "", help = "Module name of BLAST")
@@ -90,6 +91,12 @@ def main():
     job_count = 0
     job_left = len(args.assemblies)
     tasks = ""
+    
+    if args.serial:
+        job_line_terminal = "\n"
+    else:
+        job_line_terminal = " &\n"  # run jobs of the same bundle in parallel
+    
     for assembly_filename in args.assemblies:
         assembly_name = rchop(os.path.basename(assembly_filename), args.suffix)
         
@@ -104,7 +111,12 @@ def main():
         to run properly, otherwise, it reports an error that "Couldn't decide what to do with file results".
         """
         tasks += " --prefix " + assembly_name + "_" + args.prefix  # to comply with the SRST2 convention: sample_prefix__[database name]...
-        tasks += " " + args.other_args + " &\n"  # send this task to the background
+        if args.suffix != "":
+            tasks += " --suffix " + args.suffix
+        if args.other_args != "":
+            tasks += " " + args.other_args + job_line_terminal  # send this task to the background
+        else:
+            tasks += job_line_terminal
         job_count += 1
         job_left -= 1
         
@@ -116,7 +128,10 @@ def main():
                 bundle_cmd += "\n#SBATCH --account=" + args.account
             bundle_cmd += "\n#SBATCH --partition=" + args.partition
             bundle_cmd += "\n#SBATCH --job-name=" + args.bundle_name_prefix + "_" + str(bundle_count)
-            bundle_cmd += "\n#SBATCH --ntasks=" + str(job_count)
+            if args.serial:
+                bundle_cmd += "\n#SBATCH --ntasks=1"
+            else:
+                bundle_cmd += "\n#SBATCH --ntasks=" + str(job_count)
             bundle_cmd += "\n#SBATCH --cpus-per-task=1"
             bundle_cmd += "\n#SBATCH --mem-per-cpu=" + args.memory  # memory per task (CPU) when there has to be one processor (CPU) per task
             bundle_cmd += "\n#SBATCH --time=" + args.walltime
