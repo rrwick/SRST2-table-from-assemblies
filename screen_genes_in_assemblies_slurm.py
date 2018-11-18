@@ -143,10 +143,14 @@ def main():
                 add_modules = args.other_modules.split(",")
                 for m in add_modules:
                     bundle_cmd += "\nmodule load " + m + "\n"
-            bundle_cmd += tasks + "wait\n"  # terminate this bundle only when all tasks end
+            bundle_cmd += tasks  # terminate this bundle only when all tasks end
+            if not args.serial:
+                bundle_cmd += "wait\n"
+            script_file = os.path.join(args.outdir, "job_bundle_" + str(bundle_count) + ".slurm")
+            with open(script_file, "w") as f_script:
+                f_script.write(bundle_cmd)
             if run:
-                os.system("echo '" + bundle_cmd + "' | sbatch")  # submit this bundle of jobs
-            print(bundle_cmd)  # put this and the following two commands after the submission to increase the interval between two submissions
+                os.system("sbatch " + script_file)  # submit this bundle of jobs. Command echo "$bundle_cmd" | sbatch does not work when bundle_cmd is too long.
             job_count = 0
             tasks = ""
             time.sleep(1)  # futher delay the submission process in order to give the scheduler enough time to process all commands
