@@ -111,7 +111,7 @@ This is a special case of calling the best alleles for a panel of seven genes gi
 
 An example command is:
 ```
-python screener\_slurm.py --walltime '0-1:0:0' --outdir mlst --script screener.py --assemblies assemblies/*.fasta --gene_db mlst_db.fasta --prefix test --suffix ".fasta" --report_all_consensus --mlst > mlst.log
+python screener_slurm.py --walltime '0-1:0:0' --outdir mlst --script screener.py --assemblies assemblies/*.fasta --gene_db mlst_db.fasta --prefix test --suffix ".fasta" --report_all_consensus --mlst > mlst.log
 ```
 
 ### 3. Screening for all valid alleles per gene
@@ -127,7 +127,7 @@ python screener.py --gene_db ARGannot_r2.fasta --prefix demo1 --suffix '_spades.
 A parallel version for a large number of assemblies
 
 ```
-python screener\_slurm.py --script screener.py --algorithm megablast --walltime "0-0:30:0" --memory 1024 --partition project1 --bundle_name_prefix test --bundle_size 16 --outdir genes --assemblies data/assemblies/*.fasta --prefix demo2 --suffix '_spades.fasta' --gene_db ARGannot_r2.fasta --other_args "--incl_alt --max_overlapping_nt 0 --report_all_consensus" > gene_screen.log
+python screener_slurm.py --script screener.py --algorithm megablast --walltime "0-0:30:0" --memory 1024 --partition project1 --bundle_name_prefix test --bundle_size 16 --outdir genes --assemblies data/assemblies/*.fasta --prefix demo2 --suffix '_spades.fasta' --gene_db ARGannot_r2.fasta --other_args "--incl_alt --max_overlapping_nt 0 --report_all_consensus" > gene_screen.log
 ```
 
 **Example output table**
