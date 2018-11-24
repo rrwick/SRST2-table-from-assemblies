@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 """
-SRST2 results from assemblies
-
-This is a tool to screen for genes in a collection of assemblies and output
-the results in a table which mimics those produced by SRST2.
+This is a wrapper to run screener.py for multiple assemblies via SLURM.
 
 Python versions 2.7 and 3 compatible.
-Previous name: srst2_table_from_assemblies_slurm.py
+Previous names: srst2_table_from_assemblies_slurm.py and screen_genes_in_assemblies_slurm.py
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)

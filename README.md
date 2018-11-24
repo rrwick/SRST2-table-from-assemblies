@@ -13,7 +13,7 @@ Citation: Ryan R. Wick, Yu Wan, _gene\_screen\_in\_assemblies_, https://github.c
 ## Arguments and options
 
 ```
-python screen_genes_in_assemblies.py -h
+python screener.py -h
        --assemblies ASSEMBLIES
        [ASSEMBLIES ...] --gene_db GENE_DB
        [--prefix PREFIX] [--suffix SUFFIX]
@@ -45,12 +45,12 @@ python screen_genes_in_assemblies.py -h
 
 ## Parallel gene screen through the SLURM queueing system
 
-Another script, screen\_genes\_in\_assemblies\_slurm.py, is included to generate a series of SLURM jobs to efficiently run many gene screens in parallel, although the script screen\_genes\_in\_assemblies.py is also able to handle multiple FASTA files (but in a series manner). Since this script produces a separate output table for each assembly, so a user may want to [compile them together using SRST2](https://github.com/katholt/srst2#running-lots-of-jobs-and-compiling-results) afterwards.
+Another script, screener\_slurm.py, is included to generate a series of SLURM jobs to efficiently run many gene screens in parallel, although the script screener.py is also able to handle multiple FASTA files (but in a series manner). Since this script produces a separate output table for each assembly, so a user may want to [compile them together using SRST2](https://github.com/katholt/srst2#running-lots-of-jobs-and-compiling-results) afterwards.
 
 ## Outputs
 Assuming assembly files are named in the format of \[sample name\]\[suffix\].fasta, and this tool is run with the correct `--suffix` specification.
  
-### srst2\_table\_from\_assemblies.py
+### screener.py
 There are four files generated for all samples when options `--report_new_consensus`, `--report_all_consensus` and `--del_blast` are turned on.
 
 * [prefix]\_\_genes\_\_[gene\_db]\_\_results.txt: gene profiles for all samples. It is equivalent to the compiled gene profiles produced by the SRST2 command `python srst2.py --prev_output`.
@@ -58,8 +58,8 @@ There are four files generated for all samples when options `--report_new_consen
 * [prefix].new\_consensus\_alleles.fasta: consensus sequences of all valid imperfect matches (namely, variants) from all samples.
 * [prefix]\_\_blast\_\_[gene\_db]\_\_results.txt: raw BLAST outputs with a header line attached for each sample.
 
-### srst2\_table\_from\_assemblies\_slurm.py
-This script makes output files for each sample, which is different from the behaviour of srst2\_table\_from\_assemblies.py.
+### screener\_slurm.py
+This script makes output files for each sample, which is different from the behaviour of screener.py.
 
 * [sample]\_[prefix]\_\_genes\_\_[gene\_db]\_\_results.txt: a gene profile is generated for each sample.
 * [sample]\_[prefix].all\_consensus\_alleles.fasta: consensus sequences of the current sample.
@@ -71,7 +71,7 @@ This script makes output files for each sample, which is different from the beha
 ### 1. Screening for the best allele call per gene
 This example strictly follows the output format of SRST2 to make a single (but the best) allele call for each sequence cluster (representing a gene) in the reference gene database. In this example, the option `--incl_alt` is left off.  
 
-`screen_genes_in_assemblies.py --assemblies *.fasta --gene_db gene_db.fasta --algorithm blastn --output test --report_new_consensus`
+`screener.py --assemblies *.fasta --gene_db gene_db.fasta --algorithm blastn --output test --report_new_consensus`
 
 This command (1) screens every one of the assemblies (all `*.fasta` files) for each of the genes in `resistance_genes.mfasta` using `blastn`; (2) saves a table of results to test\_\_genes\_\_gene\_db\_\_results.txt; and (3) saves a FASTA file of any new alleles into new\_alleles.fasta.
 
@@ -111,7 +111,7 @@ This is a special case of calling the best alleles for a panel of seven genes gi
 
 An example command is:
 ```
-python screen_genes_in_assemblies_slurm.py --walltime '0-1:0:0' --outdir mlst --script srst2_table_from_assemblies.py --assemblies assemblies/*.fasta --gene_db mlst_db.fasta --prefix test --suffix ".fasta" --report_all_consensus --mlst > mlst.log
+python screener\_slurm.py --walltime '0-1:0:0' --outdir mlst --script screener.py --assemblies assemblies/*.fasta --gene_db mlst_db.fasta --prefix test --suffix ".fasta" --report_all_consensus --mlst > mlst.log
 ```
 
 ### 3. Screening for all valid alleles per gene
@@ -121,13 +121,13 @@ This is an extension of the SRST2 output format, where multiple allele calls are
 A single-job version for two assemblies
 
 ```
-python screen_genes_in_assemblies.py --gene_db ARGannot_r2.fasta --prefix demo1 --suffix '_spades.fasta' --outdir genes --report_new_consensus --report_all_consensus --algorithm megablast --incl_alt --max_overlapping_nt 0 --assemblies strain1_spades.fasta strain2_spades.fasta
+python screener.py --gene_db ARGannot_r2.fasta --prefix demo1 --suffix '_spades.fasta' --outdir genes --report_new_consensus --report_all_consensus --algorithm megablast --incl_alt --max_overlapping_nt 0 --assemblies strain1_spades.fasta strain2_spades.fasta
 ```
 
 A parallel version for a large number of assemblies
 
 ```
-python screen_genes_in_assemblies_slurm.py --script srst2_table_from_assemblies.py --algorithm megablast --walltime "0-0:30:0" --memory 1024 --partition project1 --bundle_name_prefix test --bundle_size 16 --outdir genes --assemblies data/assemblies/*.fasta --prefix demo2 --suffix '_spades.fasta' --gene_db ARGannot_r2.fasta --other_args "--incl_alt --max_overlapping_nt 0 --report_all_consensus" > gene_screen.log
+python screener\_slurm.py --script screener.py --algorithm megablast --walltime "0-0:30:0" --memory 1024 --partition project1 --bundle_name_prefix test --bundle_size 16 --outdir genes --assemblies data/assemblies/*.fasta --prefix demo2 --suffix '_spades.fasta' --gene_db ARGannot_r2.fasta --other_args "--incl_alt --max_overlapping_nt 0 --report_all_consensus" > gene_screen.log
 ```
 
 **Example output table**

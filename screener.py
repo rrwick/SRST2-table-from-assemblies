@@ -10,11 +10,11 @@ Subject sequences (serves as a BLAST database): a collection of genome assemblie
 Query sequences: a reference gene database in the SRST2-compatible format
 
 Python versions 2.7 and 3 compatible.
-Previous name: srst2_table_from_assemblies.py
+Previous names: srst2_table_from_assemblies.py and screen_genes_in_assemblies.py
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
-Latest edition: 8-9 Sep 2017
+Early edition: 8-9 Sep 2017; the latest edition: 24 Nov 2018
 """
 
 from __future__ import print_function
