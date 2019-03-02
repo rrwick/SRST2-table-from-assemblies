@@ -1,19 +1,21 @@
-# Gene screen for genome assemblies
+# Targeted gene detection for genome assemblies
 
 [![DOI](https://zenodo.org/badge/65195290.svg)](https://zenodo.org/badge/latestdoi/65195290)
 
-This is a tool for conducting a gene screen on assemblies. It produces a table in the format of [SRST2](https://github.com/katholt/srst2)'s compiled results. It is particularly useful when you want to screen for genes in samples where some of them have reads available while the others only have assemblies. For reads, you can use SRST2 to perform the gene screen; and for assemblies, you may use this script to produce results that can be compiled with those obtained from reads. Nonetheless, note that if you have both reads and assemblies for the same sample, it is preferable to use SRST2 on the reads instead of using this script on assemblies, as SRST2 has better sensitivity (variants may get lost for various reasons during the assembly process).
+This is a tool for conducting a gene detection in assemblies that are represented as contigs. It produces a table in the format of [SRST2](https://github.com/katholt/srst2)'s compiled results. It is particularly useful when you want to screen for genes in samples where some of them have reads available while the others only have assemblies. For reads, you can use SRST2 to perform the gene screen; and for assemblies, you may use this script to produce results that can be compiled with those obtained from reads. Nonetheless, note that if you have both reads and assemblies for the same sample, it is preferable to use SRST2 on the reads instead of using this script on assemblies, as SRST2 has better sensitivity (variants may get lost for various reasons during the assembly process).
 
-Although this tool is designed for screening genes in haploid organisms, it is in principle applicable to other organisms as well.  
+Although this tool is designed for detecting genes in haploid organisms, it is in principle applicable to other organisms as well. In addition, it can be used to detect other kinds of sequences, such as multi-gene loci, when the reference database is properly formatted.  
 
 Dependency: this tool is Python 2 and 3 compatible. It requires a local [BLAST+](http://www.ncbi.nlm.nih.gov/books/NBK279690/) installation to conduct nucleotide-level gene searches.
 
-Citation: Ryan R. Wick, Yu Wan, _gene\_screen\_in\_assemblies_, https://github.com/wanyuac/screen_genes_in_assemblies.git, doi: 10.5281/zenodo.893164.
+Citation: Ryan R. Wick, Yu Wan, _geneDetector_, https://github.com/wanyuac/geneDetector, doi: 10.5281/zenodo.893164.
+
+This tool was called _gene\_screen\_in\_assemblies_.
 
 ## Arguments and options
 
 ```
-python screener.py -h
+python detector.py -h
        --assemblies ASSEMBLIES
        [ASSEMBLIES ...] --gene_db GENE_DB
        [--prefix PREFIX] [--suffix SUFFIX]
@@ -45,12 +47,12 @@ python screener.py -h
 
 ## Parallel gene screen through the SLURM queueing system
 
-Another script, screener\_slurm.py, is included to generate a series of SLURM jobs to efficiently run many gene screens in parallel, although the script screener.py is also able to handle multiple FASTA files (but in a series manner). Since this script produces a separate output table for each assembly, so a user may want to [compile them together using SRST2](https://github.com/katholt/srst2#running-lots-of-jobs-and-compiling-results) afterwards.
+Another script, detector\_slurm.py, is included to generate a series of SLURM jobs to efficiently run many gene screens in parallel, although the script detector.py is also able to handle multiple FASTA files (but in a series manner). Since this script produces a separate output table for each assembly, so a user may want to [compile them together using SRST2](https://github.com/katholt/srst2#running-lots-of-jobs-and-compiling-results) afterwards.
 
 ## Outputs
 Assuming assembly files are named in the format of \[sample name\]\[suffix\].fasta, and this tool is run with the correct `--suffix` specification.
  
-### screener.py
+### detector.py
 There are four files generated for all samples when options `--report_new_consensus`, `--report_all_consensus` and `--del_blast` are turned on.
 
 * [prefix]\_\_genes\_\_[gene\_db]\_\_results.txt: gene profiles for all samples. It is equivalent to the compiled gene profiles produced by the SRST2 command `python srst2.py --prev_output`.
@@ -58,8 +60,8 @@ There are four files generated for all samples when options `--report_new_consen
 * [prefix].new\_consensus\_alleles.fasta: consensus sequences of all valid imperfect matches (namely, variants) from all samples.
 * [prefix]\_\_blast\_\_[gene\_db]\_\_results.txt: raw BLAST outputs with a header line attached for each sample.
 
-### screener\_slurm.py
-This script makes output files for each sample, which is different from the behaviour of screener.py.
+### detector\_slurm.py
+This script makes output files for each sample, which is different from the behaviour of detector.py.
 
 * [sample]\_[prefix]\_\_genes\_\_[gene\_db]\_\_results.txt: a gene profile is generated for each sample.
 * [sample]\_[prefix].all\_consensus\_alleles.fasta: consensus sequences of the current sample.
@@ -71,7 +73,7 @@ This script makes output files for each sample, which is different from the beha
 ### 1. Screening for the best allele call per gene
 This example strictly follows the output format of SRST2 to make a single (but the best) allele call for each sequence cluster (representing a gene) in the reference gene database. In this example, the option `--incl_alt` is left off.  
 
-`screener.py --assemblies *.fasta --gene_db gene_db.fasta --algorithm blastn --output test --report_new_consensus`
+`detector.py --assemblies *.fasta --gene_db gene_db.fasta --algorithm blastn --output test --report_new_consensus`
 
 This command (1) screens every one of the assemblies (all `*.fasta` files) for each of the genes in `resistance_genes.mfasta` using `blastn`; (2) saves a table of results to test\_\_genes\_\_gene\_db\_\_results.txt; and (3) saves a FASTA file of any new alleles into new\_alleles.fasta.
 
@@ -111,7 +113,7 @@ This is a special case of calling the best alleles for a panel of seven genes gi
 
 An example command is:
 ```
-python screener_slurm.py --walltime '0-1:0:0' --outdir mlst --script screener.py --assemblies assemblies/*.fasta --gene_db mlst_db.fasta --prefix test --suffix ".fasta" --report_all_consensus --mlst > mlst.log
+python detector_slurm.py --walltime '0-1:0:0' --outdir mlst --script detector.py --assemblies assemblies/*.fasta --gene_db mlst_db.fasta --prefix test --suffix ".fasta" --report_all_consensus --mlst > mlst.log
 ```
 
 ### 3. Screening for all valid alleles per gene
@@ -121,13 +123,13 @@ This is an extension of the SRST2 output format, where multiple allele calls are
 A single-job version for two assemblies
 
 ```
-python screener.py --gene_db ARGannot_r2.fasta --prefix demo1 --suffix '_spades.fasta' --outdir genes --report_new_consensus --report_all_consensus --algorithm megablast --incl_alt --max_overlapping_nt 0 --assemblies strain1_spades.fasta strain2_spades.fasta
+python detector.py --gene_db ARGannot_r2.fasta --prefix demo1 --suffix '_spades.fasta' --outdir genes --report_new_consensus --report_all_consensus --algorithm megablast --incl_alt --max_overlapping_nt 0 --assemblies strain1_spades.fasta strain2_spades.fasta
 ```
 
 A parallel version for a large number of assemblies
 
 ```
-python screener_slurm.py --script screener.py --algorithm megablast --walltime "0-0:30:0" --memory 1024 --partition project1 --bundle_name_prefix test --bundle_size 16 --outdir genes --assemblies data/assemblies/*.fasta --prefix demo2 --suffix '_spades.fasta' --gene_db ARGannot_r2.fasta --other_args "--incl_alt --max_overlapping_nt 0 --report_all_consensus" > gene_screen.log
+python detector_slurm.py --script detector.py --algorithm megablast --walltime "0-0:30:0" --memory 1024 --partition project1 --bundle_name_prefix test --bundle_size 16 --outdir genes --assemblies data/assemblies/*.fasta --prefix demo2 --suffix '_spades.fasta' --gene_db ARGannot_r2.fasta --other_args "--incl_alt --max_overlapping_nt 0 --report_all_consensus" > gene_screen.log
 ```
 
 **Example output table**

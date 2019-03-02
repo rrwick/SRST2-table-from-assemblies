@@ -1,6 +1,6 @@
 #!/bin/bash
 # Pool FASTA files of each strain into a single multi-FASTA file, which simplifies the gene screen using
-# the script screen_genes_in_assemblies.py.
+# the script detector.py.
 #
 # Usage:
 #   pool_seqs.sh --in_dir="./fasta" --out_dir="./fasta_pooled/" --suffix "__*.fasta" strain1 strain2 ...

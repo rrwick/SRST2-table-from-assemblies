@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This is a module providing classes to process BLAST outputs. It works for the script screen_genes_in_assemblies.py.
+This is a module providing classes to process BLAST outputs. It works for the script detector.py.
 
 Python versions 2.7 and 3 compatible
 
@@ -15,7 +15,7 @@ from collections import namedtuple
 
 """
 The following named tuple class stores information extracted from each row of the BLAST outputs.
-The allele name "allele" is extracted from the query name and is modified according to the logical variable unique_allele_symbols in screen_genes_in_assemblies.py.
+The allele name "allele" is extracted from the query name and is modified according to the logical variable unique_allele_symbols in detector.py.
 """
 Hit = namedtuple("Hit", ["query", "cluster", "allele", "query_length", "coverage", "contig", "hit_length", "start", "end", \
                          "identity", "bit_score", "perfect_match", "hit_seq"])

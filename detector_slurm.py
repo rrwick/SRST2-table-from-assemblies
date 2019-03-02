@@ -3,7 +3,7 @@
 This is a wrapper to run screener.py for multiple assemblies via SLURM.
 
 Python versions 2.7 and 3 compatible.
-Previous names: srst2_table_from_assemblies_slurm.py and screen_genes_in_assemblies_slurm.py
+Previous names: srst2_table_from_assemblies_slurm.py, screen_genes_in_assemblies_slurm.py and screener_slurm.py
 
 Copyright (C) 2015-2017 Ryan Wick <rrwick@gmail.com>, Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public License, version 3 (https://www.gnu.org/licenses/gpl-3.0.en.html)
@@ -16,14 +16,14 @@ sys.dont_write_bytecode = True  # Do not write .pyc files on the import of sourc
 import argparse
 import os
 import time
-from screen_genes_in_assemblies import check_file_exists, check_algorithm, rchop
+from detector import check_file_exists, check_algorithm, rchop
 
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description = "Screen genes in assemblies - a SLURM job generator")
+    parser = argparse.ArgumentParser(description = "Targeted gene detection for assemblies - a SLURM job generator")
     
     # SLURM arguments
-    parser.add_argument("--script", type = str, required = False, default = "./screen_genes_in_assemblies.py", help = "path to screen_genes_in_assemblies.py, if not in the current directory or this script's directory")
+    parser.add_argument("--script", type = str, required = False, default = "./detector.py", help = "path to detector.py, if not in the current directory or this script's directory")
     parser.add_argument("--walltime", type = str, required = False, default = "0-0:30:0", help = "wall time for each job bundle (default: 0-0:30:0 = 30 min)")
     parser.add_argument("--memory", type = str, required = False, default = "512", help = "memory assigned to every job (default: 512 MB)")
     parser.add_argument("--account", type = str, required = False, default = "", help = "SLURM account name (default: null)")
@@ -39,7 +39,7 @@ def get_arguments():
     parser.add_argument("--algorithm", type = str, required = False, default = "megablast", help = "blast algorithm (megablast)")
     parser.add_argument("--prefix", type = str, required = False, default = "BLAST", help = "Output prefix for the table of results")
     parser.add_argument("--suffix", type = str, required = False, default = ".fasta", help = "Characters to be chopped off from the end of every assembly name in order to get a sample name")
-    parser.add_argument("--other_args", type = str, required = False, help = "A single string consisting of other arguments to be passed directly to screen_genes_in_assemblies.py")
+    parser.add_argument("--other_args", type = str, required = False, help = "A single string consisting of other arguments to be passed directly to detector.py")
     parser.add_argument("--serial", action = "store_true", required = False, help = "Run jobs within the same bunch in a serial manner.")
     
     # environment settings
@@ -60,21 +60,21 @@ def main():
     if args.algorithm:
         check_algorithm(args.algorithm)
     if args.script:
-        if args.script.endswith("screen_genes_in_assemblies.py"):
+        if args.script.endswith("detector.py"):
             script_path = args.script
         else:
-            script_path = os.path.join(args.script, "screen_genes_in_assemblies.py")
+            script_path = os.path.join(args.script, "detector.py")
         check_file_exists(script_path)
     else:
-        script_path_cwd = os.path.join(os.getcwd(), "screen_genes_in_assemblies.py")
+        script_path_cwd = os.path.join(os.getcwd(), "detector.py")
         if os.path.isfile(script_path_cwd):
             script_path = script_path_cwd
         else:
-            script_path_file_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "screen_genes_in_assemblies.py")
+            script_path_file_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "detector.py")
             if os.path.isfile(script_path_file_directory):
                 script_path = script_path_file_directory
             else:
-                sys.exit("Error: could not find the script screen_genes_in_assemblies.py")
+                sys.exit("Error: could not find the script detector.py")
 
     # Generate and submit a SLURM script for each assembly ###############
     """
