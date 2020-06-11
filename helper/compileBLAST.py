@@ -60,7 +60,7 @@ def main():
     out_faa_handles = {}
 
     for g in genes:
-        p = g.capitalize()
+        p = g[0].upper() + g[1 : ]  # Function capitalize() changes other letters to lower case
         genes_prot[g] = p  # Protein name
         fna_out = open('%s__%s.fna' % (args.output, g), 'w')
         faa_out = open('%s__%s.faa' % (args.output, p), 'w')
@@ -88,8 +88,8 @@ def main():
 
                 # Translate DNA till the first stop codon
                 try:
-                    seq_prot = seq_dna.translate(table = args.codon_table, id = seq_id.capitalize(), description = '', to_stop = True,\
-                        cds = False)  # Set cds = True to check error: 'First codon is not a start codon'.
+                    seq_prot = seq_dna.translate(table = args.codon_table, id = seq_id[0].upper() + seq_id[1 : ],\
+                        description = '', to_stop = True, cds = False)  # Set cds = True to check error: 'First codon is not a start codon'.
                 except KeyError:
                     print('Warning: sequence of %s in %s cannot be translated.' % (g, sample_name))
                     seq_prot = SeqRecord(Seq(''), id = '', name = '', description = '')
