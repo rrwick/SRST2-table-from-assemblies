@@ -5,7 +5,7 @@ Compile and parse nucleotide BLAST+ outputs (outfmt 6) for a number of genomes. 
 generated using command line:
 blastn -query [FASTA file] -db [Database name] -out [sample name][delimiter][suffix].tsv -task megablast \
     -evalue [1e-5] -perc_identity [70] -max_target_seqs [10] \
-    -outfmt '6 qseqid sseqid pident qcovhsp length mismatch gapopen qstart qend sstart send evalue bitscore sseq'
+    -outfmt '6 qseqid sseqid slen pident qcovhsp length mismatch gapopen qstart qend sstart send sstrand evalue bitscore sseq'
 
 Input: Files of BLAST+ outputs in output format 6.
 Outputs:
@@ -18,7 +18,7 @@ Dependencies: Python 3, BioPython
 
 Copyright (C) 2020 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Publication: 11 June 2020; the latest modification: 23 June 2020
+Publication: 11 June 2020; the latest modification: 4 July 2020
 """
 
 import os
@@ -49,14 +49,17 @@ def parse_arguments():
     return parser.parse_args()
 
 
+HIT_ATTRS = ['qseqid', 'sseqid', 'slen', 'pident', 'qcovhsp', 'length', 'mismatch', 'gapopen', 'qstart', 'qend',\
+             'sstart', 'send', 'sstrand', 'evalue', 'bitscore']  # 15 attribute fields
+
+
 def main():
     args = parse_arguments()
 
     # Create output files, keep them open, and save their handles
     genes = args.genes.split(',')
     out_tsv = open(args.output + '.tsv', 'w')
-    out_tsv.write('\t'.join(['sample', 'qseqid', 'sseqid', 'pident', 'qcovhsp', 'length', 'mismatch',\
-        'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore']) + '\n')  # The write method does not automatically append a newline character to the end of the output line.
+    out_tsv.write('\t'.join(['sample'] + HIT_ATTRS) + '\n')  # The write method does not automatically append a newline character to the end of the output line.
     out_fna_handles = {}
     if args.translate:
         genes_prot = {}  # Protein names from gene names
@@ -85,12 +88,13 @@ def main():
             g = hit.qseqid  # Name of the query gene
             if g in genes:
                 # Write alignment information
-                out_tsv.write('\t'.join([sample_name, hit.qseqid, hit.sseqid, hit.pident, hit.qcovhsp, hit.length, hit.mismatch,\
-                    hit.gapopen, hit.qstart, hit.qend, hit.sstart, hit.send, hit.evalue, hit.bitscore]) + '\n')
+                out_tsv.write('\t'.join([sample_name, hit.qseqid, hit.sseqid, hit.slen, hit.pident, hit.qcovhsp, hit.length,\
+                              hit.mismatch, hit.gapopen, hit.qstart, hit.qend, hit.sstart, hit.send, hit.sstrand, hit.evalue,\
+                              hit.bitscore]) + '\n')
                 
                 # Prepare a DNA record
                 seq_id = '.'.join([g, sample_name]) if args.add_sample_name else g
-                descr = '|'.join([g, sample_name, hit.sseqid, hit.sstart + '-' + hit.send])  # It changes later when args.translate = True.
+                descr = '|'.join([g, sample_name, hit.sseqid, hit.sstart + '-' + hit.send, hit.sstrand])  # It changes later when args.translate = True.
                 seq_dna = SeqRecord(Seq(hit.sseq), id = seq_id, name = '', description = '')  # The description will be filled later.
 
                 # Write the protein sequence when it is required
@@ -98,7 +102,7 @@ def main():
                     # Translate DNA till the first stop codon
                     try:
                         seq_prot = seq_dna.translate(table = args.codon_table, id = seq_id[0].upper() + seq_id[1 : ],\
-                            description = '', to_stop = True, cds = False)  # Set cds = True to check error: 'First codon is not a start codon'.
+                                   description = '', to_stop = True, cds = False)  # Set cds = True to check error: 'First codon is not a start codon'.
                     except KeyError:
                         print('Warning: sequence of %s in %s cannot be translated.' % (g, sample_name))
                         seq_prot = SeqRecord(Seq(''), id = '', name = '', description = '')
@@ -128,16 +132,15 @@ def parse_blast_line(line):
     """
     Parse each line of BLAST outputs into a Hit object (namedtuple)
     """
-    Hit = namedtuple("Hit", ['qseqid', 'sseqid', 'pident', 'qcovhsp', 'length', 'mismatch', 'gapopen',\
-        'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore', 'sseq'])
+    Hit = namedtuple("Hit", HIT_ATTRS + ['sseq'])
     fields = line.split('\t')
 
     # Use a regular expression to remove gaps ('-') in the DNA sequence.
     # See stackoverflow.com/questions/3939361/remove-specific-characters-from-a-string-in-python
-    hit = Hit(qseqid = fields[0], sseqid = fields[1], pident = fields[2], qcovhsp = fields[3],\
-        length = fields[4], mismatch = fields[5], gapopen = fields[6], qstart = fields[7],\
-        qend = fields[8], sstart = fields[9], send = fields[10], evalue = fields[11],\
-        bitscore = fields[12], sseq = re.sub('-', '', fields[13]))
+    hit = Hit(qseqid = fields[0], sseqid = fields[1], slen = fields[2], pident = fields[3], qcovhsp = fields[4],\
+              length = fields[5], mismatch = fields[6], gapopen = fields[7], qstart = fields[8], qend = fields[9],\
+              sstart = fields[10], send = fields[11], sstrand = '+' if fields[12] == 'plus' else '-', evalue = fields[13],\
+              bitscore = fields[14], sseq = re.sub('-', '', fields[15]))
 
     return hit
 
