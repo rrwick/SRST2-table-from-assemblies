@@ -18,7 +18,7 @@ Dependencies: Python 3, BioPython
 
 Copyright (C) 2020 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Publication: 11 June 2020; the latest modification: 4 July 2020
+Publication: 11 June 2020; the latest modification: 22 July 2020
 """
 
 import os
@@ -58,7 +58,7 @@ def main():
 
     # Create output files, keep them open, and save their handles
     genes = args.genes.split(',')
-    out_tsv = open(args.output + '.tsv', 'w')
+    out_tsv = open(args.output + '__aln.tsv', 'w')  # A summary of alignments
     out_tsv.write('\t'.join(['sample'] + HIT_ATTRS) + '\n')  # The write method does not automatically append a newline character to the end of the output line.
     out_fna_handles = {}
     if args.translate:
